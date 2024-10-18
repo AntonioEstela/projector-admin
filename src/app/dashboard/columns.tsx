@@ -113,15 +113,11 @@ export const columns: ColumnDef<DashboardColumn>[] = [
             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {estado === 'Apagado' ? (
-              <DropdownMenuItem>
-                <Power className='w-4 h-4 mr-2' />
-                Encender
-              </DropdownMenuItem>
+              <DropdownMenuItem>Encender</DropdownMenuItem>
+            ) : estado === 'Encendido' ? (
+              <DropdownMenuItem>Apagar</DropdownMenuItem>
             ) : (
-              <DropdownMenuItem>
-                <PowerOff className='w-4 h-4 mr-2' />
-                Apagar
-              </DropdownMenuItem>
+              <DropdownMenuItem disabled>Apagar</DropdownMenuItem>
             )}
             <DropdownMenuSeparator />
             <DropdownMenuItem>Editar</DropdownMenuItem>

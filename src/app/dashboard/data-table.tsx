@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { DataTablePagination } from '@/components/ui/dataTablePagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
@@ -17,6 +17,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -28,6 +36,8 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
   const [globalFilter, setGlobalFilter] = React.useState<any>();
   const [search, setSearch] = React.useState<String>('');
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [selectedRow, setSelectedRow] = useState<any>(null);
+  const [isRowOpen, setIsRowOpen] = useState(false);
 
   const table = useReactTable({
     columns,
@@ -45,6 +55,11 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     table.setGlobalFilter(search);
+  };
+
+  const handleRowClick = (row: any) => {
+    setIsRowOpen(true);
+    setSelectedRow(row);
   };
 
   return (
@@ -73,7 +88,11 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  onClick={() => handleRowClick(row)}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
@@ -92,6 +111,16 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
       <div className='mt-6'>
         <DataTablePagination table={table} />
       </div>
+      {selectedRow && (
+        <Dialog open={isRowOpen} onOpenChange={setIsRowOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{selectedRow.original.nombre}</DialogTitle>
+              <DialogDescription>{JSON.stringify(selectedRow)}</DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

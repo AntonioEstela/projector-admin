@@ -20,7 +20,7 @@ const data: DashboardColumn[] = [
     horasLampara: 300,
     grupos: 'Group 2',
     etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
+    ubicacion: 'Salon 21',
     estado: 'En mantenimiento',
   },
   {
@@ -31,7 +31,7 @@ const data: DashboardColumn[] = [
     horasLampara: 120,
     grupos: 'Group 1',
     etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
+    ubicacion: 'Salon Principal',
     estado: 'Apagado',
   },
   {

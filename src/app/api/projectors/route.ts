@@ -36,7 +36,7 @@ const data: DashboardColumn[] = [
   },
   {
     ip: '193.168.3',
-    nombre: 'Projector 3',
+    nombre: 'Projector 123',
     modelo: 'Model C',
     referencia: 'Ref003',
     horasLampara: 300,
@@ -58,7 +58,7 @@ const data: DashboardColumn[] = [
   },
   {
     ip: '193.168.3',
-    nombre: 'Projector 3',
+    nombre: 'Projector 343',
     modelo: 'Model C',
     referencia: 'Ref003',
     horasLampara: 300,

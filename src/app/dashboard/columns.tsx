@@ -12,11 +12,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { ChevronsUpDown, MoreHorizontal, Power, PowerOff } from 'lucide-react';
+import { ChevronDown, ChevronsUpDown, ChevronUp, MoreHorizontal } from 'lucide-react';
 import { DropdownMenuCheckboxes } from '@/components/ui/dropdown-menu-checkboxes';
-import React from 'react';
-import { DropdownMenuCheckboxItemProps } from '@radix-ui/react-dropdown-menu';
-import { set } from 'mongoose';
+import React, { useState } from 'react';
 
 export type DashboardColumn = {
   ip: string;
@@ -38,10 +36,31 @@ export const columns: ColumnDef<DashboardColumn>[] = [
   {
     accessorKey: 'nombre',
     header: ({ column }) => {
+      const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
+
+      const toggleSorting = () => {
+        if (sortOrder === 'asc') {
+          setSortOrder('desc');
+          column.toggleSorting(false);
+        } else if (sortOrder === 'desc') {
+          setSortOrder(null);
+          column.clearSorting();
+        } else {
+          setSortOrder('asc');
+          column.toggleSorting(true);
+        }
+      };
+
       return (
-        <Button variant={'ghost'} onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-          Nombre
-          <ChevronsUpDown className='w-4 h-4 ml-2' />
+        <Button variant={'ghost'} onClick={toggleSorting}>
+          <span className='mr-2'>Nombre</span>
+          {sortOrder === 'asc' ? (
+            <ChevronUp className='w-4 h-4' />
+          ) : sortOrder === 'desc' ? (
+            <ChevronDown className='w-4 h-4' />
+          ) : (
+            <ChevronsUpDown className='w-4 h-4' />
+          )}
         </Button>
       );
     },

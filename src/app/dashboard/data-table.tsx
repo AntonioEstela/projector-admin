@@ -20,6 +20,8 @@ import { Search } from 'lucide-react';
 import { DialogTableCell } from '@/components/ui/dialog-table-cell';
 import { useRouter } from 'next/navigation';
 import { isTokenExpired } from '@/lib/jwt';
+import AddProjectorForm from '@/components/ui/add-projector-form';
+import { Projector } from '@/types/projector';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -74,16 +76,21 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
   return (
     isAuthenticated && (
       <div className='p-10'>
-        <form onSubmit={handleSearchSubmit} className='flex flex-row w-1/3 mb-10'>
-          <Input
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder='Ingresa algo para buscar...'
-            className='mr-5'
-          />
-          <Button type='submit'>
-            <Search className='w-5 h-5' />
-          </Button>
-        </form>
+        <div className='flex flex-row justify-between'>
+          <form onSubmit={handleSearchSubmit} className='flex flex-row w-1/3 mb-10'>
+            <Input
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder='Ingresa algo para buscar...'
+              className='mr-5'
+            />
+            <Button type='submit'>
+              <Search className='w-5 h-5' />
+            </Button>
+          </form>
+          <div>
+            <AddProjectorForm />
+          </div>
+        </div>
         <div className='border rounded-md'>
           <Table>
             <TableHeader>

@@ -10,6 +10,7 @@ export function verifyJWT(req: NextRequest) {
 
   const token = authHeader.split(' ')[1];
   const decoded = verifyToken(token);
+  console.log('Decoded token: ', decoded);
   if (!decoded) {
     return NextResponse.json({ message: 'Token inválido' }, { status: 403 });
   }

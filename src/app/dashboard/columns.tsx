@@ -17,6 +17,7 @@ import { DropdownMenuCheckboxes } from '@/components/ui/dropdown-menu-checkboxes
 import React, { useState } from 'react';
 
 export type DashboardColumn = {
+  id: string;
   ip: string;
   nombre: string;
   modelo: string;
@@ -120,6 +121,17 @@ export const columns: ColumnDef<DashboardColumn>[] = [
       const { estado } = row.original;
       // logica para eliminar el proyector o editarlo
 
+      const handleDelete = async () => {
+        const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/projectors`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(row.original.id),
+        });
+      };
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -140,7 +152,9 @@ export const columns: ColumnDef<DashboardColumn>[] = [
             )}
             <DropdownMenuSeparator />
             <DropdownMenuItem>Editar</DropdownMenuItem>
-            <DropdownMenuItem className='text-red-500 hover:!text-red-500'>Eliminar</DropdownMenuItem>
+            <DropdownMenuItem className='text-red-500 hover:!text-red-500' onClick={handleDelete}>
+              Eliminar
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

@@ -1,340 +1,69 @@
-import { DashboardColumn } from '@/app/dashboard/columns';
+import dbConnect from '@/lib/db';
+import { mapToDashboardColum } from '@/lib/utils';
+import { verifyJWT } from '@/middleware/auth';
+import Projector from '@/models/Projectors';
+import { NextRequest, NextResponse } from 'next/server';
 
-const data: DashboardColumn[] = [
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 3',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Salon 21',
-    estado: 'En mantenimiento',
-  },
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Salon Principal',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 123',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
-    estado: 'Encendido',
-  },
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 343',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
-    estado: 'Encendido',
-  },
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 3',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
-    estado: 'Encendido',
-  },
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 3',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
-    estado: 'Encendido',
-  },
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 3',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
-    estado: 'Encendido',
-  },
+export async function GET() {
+  try {
+    await dbConnect();
 
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 3',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
-    estado: 'Encendido',
-  },
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 3',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
-    estado: 'Encendido',
-  },
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 3',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
-    estado: 'Encendido',
-  },
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 3',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
-    estado: 'Encendido',
-  },
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 3',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
-    estado: 'Encendido',
-  },
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 3',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
-    estado: 'Encendido',
-  },
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 3',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
-    estado: 'Encendido',
-  },
+    const projectors = await Projector.find();
 
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 3',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
-    estado: 'Encendido',
-  },
-  {
-    ip: '193.168.2',
-    nombre: 'Projector 2',
-    modelo: 'Model B',
-    referencia: 'Ref002',
-    horasLampara: 120,
-    grupos: 'Group 1',
-    etiquetas: ['tag1', 'tag2'],
-    ubicacion: 'Room 2',
-    estado: 'Apagado',
-  },
-  {
-    ip: '193.168.3',
-    nombre: 'Projector 3',
-    modelo: 'Model C',
-    referencia: 'Ref003',
-    horasLampara: 300,
-    grupos: 'Group 2',
-    etiquetas: ['tag3'],
-    ubicacion: 'Room 3',
-    estado: 'Encendido',
-  },
-];
+    console.log(projectors);
+    const mappedProjectors = projectors.map((projector: any) => mapToDashboardColum(projector));
+    console.log(mappedProjectors);
+    return NextResponse.json(mappedProjectors);
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ message: 'Error al obtener los proyectores' }, { status: 500 });
+  }
+}
 
-export function GET() {
-  return Response.json(data);
+export async function POST(req: NextRequest) {
+  try {
+    verifyJWT(req);
+
+    await dbConnect();
+
+    const { ip, nombre, modelo, referencia, horasLampara, grupos, etiquetas, ubicacion, estado } = await req.json();
+
+    const newProjector = new Projector({
+      name: nombre,
+      projectorModel: modelo,
+      location: ubicacion,
+      ipAddress: ip,
+      status: estado,
+      lampHours: horasLampara,
+      tags: etiquetas,
+      reference: referencia,
+      groups: grupos,
+    });
+
+    await newProjector.save();
+
+    return NextResponse.json({ message: 'Projector added successfully' });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ message: 'Invalid or expired token' }, { status: 403 });
+  }
+}
+
+export async function PUT(req: NextRequest) {}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    verifyJWT(req);
+
+    await dbConnect();
+
+    const id = await req.json();
+
+    await Projector.findByIdAndDelete(id);
+
+    return NextResponse.json({ message: 'Projector deleted successfully' });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ message: 'Invalid or expired token' }, { status: 403 });
+  }
 }

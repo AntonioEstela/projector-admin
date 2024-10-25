@@ -52,7 +52,7 @@ export default function LoginForm() {
       } else {
         setError(data.message || 'Ocurrió un error. Inténtalo nuevamente.');
       }
-    } catch (err) {
+    } catch {
       setError('Ocurrió un error. Inténtalo nuevamente.');
     }
   };

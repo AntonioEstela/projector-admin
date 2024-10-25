@@ -1,3 +1,5 @@
+/* eslint-disable no-var */
+
 import mongoose from 'mongoose';
 
 const MONGODB_URI = process.env.NEXT_PUBLIC_MONGODB_URI as string;
@@ -15,7 +17,7 @@ declare global {
   var mongoose: MongooseCache;
 }
 
-let cached = global.mongoose ?? { conn: null, promise: null };
+const cached = global.mongoose ?? { conn: null, promise: null };
 
 async function dbConnect(): Promise<mongoose.Connection> {
   if (cached.conn) {

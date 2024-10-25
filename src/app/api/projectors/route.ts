@@ -4,14 +4,26 @@ import { verifyJWT } from '@/middleware/auth';
 import Projector from '@/models/Projectors';
 import { NextRequest, NextResponse } from 'next/server';
 
+type DbProjector = {
+  _id: string;
+  name: string;
+  projectorModel: string;
+  location: string;
+  ipAddress: string;
+  status: string;
+  lampHours: number;
+  tags: string[];
+  reference: string;
+  groups: string;
+};
+
 export async function GET() {
   try {
     await dbConnect();
 
     const projectors = await Projector.find();
 
-    console.log(projectors);
-    const mappedProjectors = projectors.map((projector: any) => mapToDashboardColum(projector));
+    const mappedProjectors = projectors.map((projector: DbProjector) => mapToDashboardColum(projector));
     console.log(mappedProjectors);
     return NextResponse.json(mappedProjectors);
   } catch (error) {
@@ -48,8 +60,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: 'Invalid or expired token' }, { status: 403 });
   }
 }
-
-export async function PUT(req: NextRequest) {}
 
 export async function DELETE(req: NextRequest) {
   try {

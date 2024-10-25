@@ -1,10 +1,9 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
+import { Column, ColumnDef } from '@tanstack/react-table';
 
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -29,6 +28,36 @@ export type DashboardColumn = {
   estado: 'Encendido' | 'Apagado' | 'En mantenimiento';
 };
 
+const SortableHeader = ({ column }: { column: Column<DashboardColumn, unknown> }) => {
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
+
+  const toggleSorting = () => {
+    if (sortOrder === 'asc') {
+      setSortOrder('desc');
+      column.toggleSorting(false);
+    } else if (sortOrder === 'desc') {
+      setSortOrder(null);
+      column.clearSorting();
+    } else {
+      setSortOrder('asc');
+      column.toggleSorting(true);
+    }
+  };
+
+  return (
+    <Button variant={'ghost'} onClick={toggleSorting}>
+      <span className='mr-2'>Nombre</span>
+      {sortOrder === 'asc' ? (
+        <ChevronUp className='w-4 h-4' />
+      ) : sortOrder === 'desc' ? (
+        <ChevronDown className='w-4 h-4' />
+      ) : (
+        <ChevronsUpDown className='w-4 h-4' />
+      )}
+    </Button>
+  );
+};
+
 export const columns: ColumnDef<DashboardColumn>[] = [
   {
     accessorKey: 'ip',
@@ -36,35 +65,7 @@ export const columns: ColumnDef<DashboardColumn>[] = [
   },
   {
     accessorKey: 'nombre',
-    header: ({ column }) => {
-      const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
-
-      const toggleSorting = () => {
-        if (sortOrder === 'asc') {
-          setSortOrder('desc');
-          column.toggleSorting(false);
-        } else if (sortOrder === 'desc') {
-          setSortOrder(null);
-          column.clearSorting();
-        } else {
-          setSortOrder('asc');
-          column.toggleSorting(true);
-        }
-      };
-
-      return (
-        <Button variant={'ghost'} onClick={toggleSorting}>
-          <span className='mr-2'>Nombre</span>
-          {sortOrder === 'asc' ? (
-            <ChevronUp className='w-4 h-4' />
-          ) : sortOrder === 'desc' ? (
-            <ChevronDown className='w-4 h-4' />
-          ) : (
-            <ChevronsUpDown className='w-4 h-4' />
-          )}
-        </Button>
-      );
-    },
+    header: ({ column }) => <SortableHeader column={column} />,
   },
   {
     accessorKey: 'modelo',
@@ -122,7 +123,7 @@ export const columns: ColumnDef<DashboardColumn>[] = [
       // logica para eliminar el proyector o editarlo
 
       const handleDelete = async () => {
-        const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/projectors`, {
+        await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/projectors`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',

@@ -29,7 +29,7 @@ export const isTokenExpired = (token: string): boolean => {
 
     // Check if the token has expired
     return decoded.exp < currentTime;
-  } catch (error) {
+  } catch {
     return true; // If there's an error decoding, treat the token as expired
   }
 };

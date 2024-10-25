@@ -21,7 +21,6 @@ import { DialogTableCell } from '@/components/ui/dialog-table-cell';
 import { useRouter } from 'next/navigation';
 import { isTokenExpired } from '@/lib/jwt';
 import AddProjectorForm from '@/components/ui/add-projector-form';
-import { Projector } from '@/types/projector';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -31,7 +30,7 @@ interface DataTableProps<TData, TValue> {
 export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState<any>();
-  const [search, setSearch] = React.useState<String>('');
+  const [search, setSearch] = React.useState<string>('');
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [isRowOpen, setIsRowOpen] = useState(false);

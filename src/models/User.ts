@@ -4,6 +4,8 @@ import bcrypt from 'bcryptjs';
 export interface IUser extends Document {
   email: string;
   password: string;
+  firstName: string;
+  lastName: string;
   comparePassword: (candidatePassword: string) => Promise<boolean>;
 }
 
@@ -14,6 +16,14 @@ const UserSchema = new mongoose.Schema<IUser>({
     unique: true,
     trim: true,
     lowercase: true,
+  },
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
   },
   password: {
     type: String,

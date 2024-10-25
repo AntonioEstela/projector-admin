@@ -15,7 +15,4 @@ export async function POST(req: Request) {
   if (!user || !(await user.comparePassword(password))) {
     return NextResponse.json({ message: 'Credenciales incorrectas' }, { status: 401 });
   }
-
-  //const token = signToken({ userId: user._id });
-  //return NextResponse.json({ token, userId: user._id });
 }

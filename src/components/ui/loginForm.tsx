@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader } from './card';
 import { isTokenExpired } from '@/lib/jwt';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { getBaseURL } from '@/lib/utils';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -31,7 +32,7 @@ export default function LoginForm() {
     setError(''); // Clear previous errors
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/login`, {
+      const res = await fetch(`${getBaseURL()}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

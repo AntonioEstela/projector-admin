@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useRouter } from 'next/navigation';
+import { getBaseURL } from '@/lib/utils';
 
 const validatePassword = (password: string): string[] => {
   const errors: string[] = [];
@@ -54,7 +55,7 @@ export default function NewUserRegistration() {
       // Aquí iría la lógica para enviar los datos del formulario
 
       const { email, password, nombre, apellido } = Object.fromEntries(formData);
-      const registrationResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/register`, {
+      const registrationResponse = await fetch(`${getBaseURL()}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -125,7 +126,7 @@ export default function NewUserRegistration() {
             </div>
             {passwordErrors.length > 0 && (
               <Alert variant='destructive'>
-                <AlertCircle className='h-4 w-4' />
+                <AlertCircle className='w-4 h-4' />
                 <AlertDescription>
                   <ul className='list-disc list-inside'>
                     {passwordErrors.map((error, index) => (
@@ -136,8 +137,8 @@ export default function NewUserRegistration() {
               </Alert>
             )}
             {passwordErrors.length === 0 && passwordStrength > 0 && (
-              <Alert variant='default' className='bg-green-50 text-green-700 border-green-200'>
-                <CheckCircle2 className='h-4 w-4' />
+              <Alert variant='default' className='text-green-700 border-green-200 bg-green-50'>
+                <CheckCircle2 className='w-4 h-4' />
                 <AlertDescription>La contraseña cumple con todos los requisitos</AlertDescription>
               </Alert>
             )}

@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronsUpDown, ChevronUp, MoreHorizontal } from 'lucide-react';
 import { DropdownMenuCheckboxes } from '@/components/ui/dropdown-menu-checkboxes';
 import React, { useState } from 'react';
+import { getBaseURL } from '@/lib/utils';
 
 export type DashboardColumn = {
   id: string;
@@ -123,7 +124,7 @@ export const columns: ColumnDef<DashboardColumn>[] = [
       // logica para eliminar el proyector o editarlo
 
       const handleDelete = async () => {
-        await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/projectors`, {
+        await fetch(`${getBaseURL()}/api/projectors`, {
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',

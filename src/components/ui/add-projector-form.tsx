@@ -10,6 +10,7 @@ import { toast } from '@/hooks/use-toast';
 import { Projector } from '@/types/projector';
 import { Plus } from 'lucide-react';
 import { DialogDescription } from '@radix-ui/react-dialog';
+import { getBaseURL } from '@/lib/utils';
 
 export default function AddProjectorForm() {
   const [open, setOpen] = useState(false);
@@ -26,7 +27,7 @@ export default function AddProjectorForm() {
   });
 
   const onAddProjector = async (projector: Projector) => {
-    const response: Response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/projectors`, {
+    const response: Response = await fetch(`${getBaseURL()}/api/projectors`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react';
 import dbConnect from '@/lib/db';
-import { columns } from './columns';
+import { columns, DashboardColumn } from './columns';
 import { DataTable } from './data-table';
 import Projector from '@/models/Projectors';
 import { mapToDashboardColum } from '@/lib/utils';
@@ -25,8 +26,23 @@ async function fetchDashboardData() {
   return projectors.map((projector: DbProjector) => mapToDashboardColum(projector));
 }
 
-export default async function Dashboard() {
-  const data = await fetchDashboardData();
+export default function Dashboard() {
+  const [data, setData] = useState<DashboardColumn[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function getData() {
+      const fetchedData = await fetchDashboardData();
+      setData(fetchedData);
+      setLoading(false);
+    }
+
+    getData();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return <DataTable data={data} columns={columns} />;
 }

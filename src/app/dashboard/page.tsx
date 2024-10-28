@@ -1,29 +1,14 @@
+'use client';
+
 import { useState, useEffect } from 'react';
-import dbConnect from '@/lib/db';
 import { columns, DashboardColumn } from './columns';
 import { DataTable } from './data-table';
-import Projector from '@/models/Projectors';
-import { mapToDashboardColum } from '@/lib/utils';
-
-type DbProjector = {
-  _id: string;
-  name: string;
-  projectorModel: string;
-  location: string;
-  ipAddress: string;
-  status: string;
-  lampHours: number;
-  tags: string[];
-  reference: string;
-  groups: string;
-};
+import { getBaseURL } from '@/lib/utils';
 
 async function fetchDashboardData() {
-  await dbConnect();
+  const projectors = await fetch(`${getBaseURL()}/api/projectors`).then((res) => res.json());
 
-  const projectors = await Projector.find();
-
-  return projectors.map((projector: DbProjector) => mapToDashboardColum(projector));
+  return projectors;
 }
 
 export default function Dashboard() {

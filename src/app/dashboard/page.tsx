@@ -7,7 +7,6 @@ import { getBaseURL } from '@/lib/utils';
 
 async function fetchDashboardData() {
   const projectors = await fetch(`${getBaseURL()}/api/projectors`).then((res) => res.json());
-
   return projectors;
 }
 

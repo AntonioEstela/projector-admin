@@ -10,7 +10,7 @@ import {
 } from './dropdown-menu';
 import { IUser } from '@/models/User';
 import { getBaseURL, getUser, isAdmin } from '@/lib/utils';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './dialog';
 import { useState } from 'react';
 import { Input } from './input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';

@@ -24,5 +24,12 @@ export async function POST(req: Request) {
   const token = signToken({ userId: user._id });
 
   // Return the token to the client
-  return NextResponse.json({ token, userId: user._id });
+  return NextResponse.json({
+    token,
+    userId: user._id,
+    role: user.role,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+  });
 }

@@ -4,6 +4,7 @@ import { Button } from './button';
 import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
+import EditProjectorForm from './edit-projector-form';
 
 export const DialogTableCell = ({
   isRowOpen,
@@ -78,6 +79,7 @@ export const DialogTableCell = ({
           <Button onClick={handleSetInput}>Configurar Entrada</Button>
         </div>
         <DialogFooter>
+          <EditProjectorForm projector={selectedRow.original} />
           <Button onClick={() => setIsRowOpen(false)}>Cerrar</Button>
         </DialogFooter>
       </DialogContent>

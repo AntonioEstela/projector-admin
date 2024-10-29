@@ -1,6 +1,6 @@
 'use client';
 
-import { Column, ColumnDef } from '@tanstack/react-table';
+import { Column, ColumnDef, Row } from '@tanstack/react-table';
 
 import {
   DropdownMenu,
@@ -27,6 +27,48 @@ export type DashboardColumn = {
   etiquetas: Array<string>;
   ubicacion: string;
   estado: 'Encendido' | 'Apagado' | 'En mantenimiento';
+};
+
+const ActionsMenu = ({ row }: { row: Row<DashboardColumn> }) => {
+  const { estado } = row.original;
+  // logica para eliminar el proyector o editarlo
+
+  const handleDelete = async () => {
+    await fetch(`${getBaseURL()}/api/projectors`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(row.original.id),
+    });
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant='ghost' className='w-8 h-8 p-0'>
+          <span className='sr-only'>Open menu</span>
+          <MoreHorizontal className='w-4 h-4' />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align='end'>
+        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {estado === 'Apagado' ? (
+          <DropdownMenuItem>Encender</DropdownMenuItem>
+        ) : estado === 'Encendido' ? (
+          <DropdownMenuItem>Apagar</DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem disabled>Apagar</DropdownMenuItem>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className='text-red-500 hover:!text-red-500' onClick={handleDelete}>
+          Eliminar
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 };
 
 const SortableHeader = ({ column }: { column: Column<DashboardColumn, unknown> }) => {
@@ -119,47 +161,6 @@ export const columns: ColumnDef<DashboardColumn>[] = [
   {
     header: 'Acciones',
     id: 'actions',
-    cell: ({ row }) => {
-      const { estado } = row.original;
-      // logica para eliminar el proyector o editarlo
-
-      const handleDelete = async () => {
-        await fetch(`${getBaseURL()}/api/projectors`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-          body: JSON.stringify(row.original.id),
-        });
-      };
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='w-8 h-8 p-0'>
-              <span className='sr-only'>Open menu</span>
-              <MoreHorizontal className='w-4 h-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {estado === 'Apagado' ? (
-              <DropdownMenuItem>Encender</DropdownMenuItem>
-            ) : estado === 'Encendido' ? (
-              <DropdownMenuItem>Apagar</DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem disabled>Apagar</DropdownMenuItem>
-            )}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Editar</DropdownMenuItem>
-            <DropdownMenuItem className='text-red-500 hover:!text-red-500' onClick={handleDelete}>
-              Eliminar
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <ActionsMenu row={row} />,
   },
 ];

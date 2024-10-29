@@ -60,7 +60,7 @@ export default function NewUserRegistration() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, firstName: nombre, lastName: apellido }),
+        body: JSON.stringify({ email, password, firstName: nombre, lastName: apellido, role: 'user' }),
       });
       console.log('Formulario enviado', Object.fromEntries(formData));
       const response = await registrationResponse;

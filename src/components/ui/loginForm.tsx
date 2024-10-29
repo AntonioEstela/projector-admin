@@ -46,6 +46,8 @@ export default function LoginForm() {
         // Store the JWT token in localStorage
         localStorage.setItem('token', data.token);
 
+        // store user data in localStorage
+        localStorage.setItem('user', JSON.stringify(data));
         // Redirect to the dashboard
         router.push('/dashboard');
       } else if (res.status === 401) {

@@ -15,6 +15,7 @@ export async function POST(req: Request) {
 
   // Create and save new user
   const newUser = new User({ email, password, firstName, lastName });
+
   await newUser.save();
 
   return NextResponse.json({ message: 'Usuario registrado exitosamente' }, { status: 201 });

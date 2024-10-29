@@ -61,6 +61,35 @@ export async function POST(req: NextRequest) {
   }
 }
 
+export async function PUT(req: NextRequest) {
+  try {
+    verifyJWT(req);
+
+    await dbConnect();
+
+    const { id, ip, nombre, modelo, referencia, horasLampara, grupos, etiquetas, ubicacion, estado } = await req.json();
+
+    const updatedProjector = {
+      name: nombre,
+      projectorModel: modelo,
+      location: ubicacion,
+      ipAddress: ip,
+      status: estado,
+      lampHours: horasLampara,
+      tags: etiquetas,
+      reference: referencia,
+      groups: grupos,
+    };
+
+    await Projector.findByIdAndUpdate(id, updatedProjector);
+
+    return NextResponse.json({ message: 'Projector updated successfully' });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ message: 'Invalid or expired token' }, { status: 403 });
+  }
+}
+
 export async function DELETE(req: NextRequest) {
   try {
     verifyJWT(req);

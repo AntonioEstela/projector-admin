@@ -24,3 +24,13 @@ export const getBaseURL = () =>
   process.env.NODE_ENV === 'production'
     ? process.env.NEXT_PUBLIC_API_BASE_URL_PROD
     : process.env.NEXT_PUBLIC_API_BASE_URL_DEV;
+
+export const getUser = () => {
+  const user = localStorage.getItem('user');
+  return user ? JSON.parse(user) : null;
+};
+
+export const isAdmin = () => {
+  const user = getUser();
+  return user?.role === 'admin';
+};

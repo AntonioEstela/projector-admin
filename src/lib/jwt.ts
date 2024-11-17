@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 
 // Generate a JWT token
 export function signToken(payload: object) {
-  return jwt.sign(payload, process.env.NEXT_PUBLIC_JWT_SECRET as string, { expiresIn: '1h' }); // Token expires in 1 hour
+  return jwt.sign(payload, process.env.NEXT_PUBLIC_JWT_SECRET as string, { expiresIn: '12h' }); // Token expires in 12 hour
 }
 
 // Verify a JWT token

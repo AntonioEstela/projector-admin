@@ -11,6 +11,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  RowSelectionState,
   SortingState,
   useReactTable,
 } from '@tanstack/react-table';
@@ -36,6 +37,7 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
   const [isRowOpen, setIsRowOpen] = useState(false);
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const table = useReactTable({
     columns,
@@ -46,8 +48,9 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
     getSortedRowModel: getSortedRowModel(),
     onGlobalFilterChange: setGlobalFilter,
     onColumnFiltersChange: setColumnFilters,
+    onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
-    state: { globalFilter, sorting, columnFilters },
+    state: { globalFilter, sorting, columnFilters, rowSelection },
   });
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -87,7 +90,7 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
             </Button>
           </form>
           <div>
-            <AddProjectorForm />
+            <AddProjectorForm rows={table.getRowModel().rows} />
           </div>
         </div>
         <div className='border rounded-md'>

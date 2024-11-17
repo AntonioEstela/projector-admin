@@ -11,10 +11,20 @@ import { Projector } from '@/types/projector';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { getBaseURL } from '@/lib/utils';
 
-export default function EditProjectorForm({ projector }: { projector: Projector }) {
-  const [open, setOpen] = useState(false);
+export default function EditProjectorForm({
+  projector,
+  rows,
+  open,
+  setOpen,
+}: {
+  projector: Projector;
+  rows: any;
+  open: boolean;
+  setOpen: any;
+}) {
   const [formData, setFormData] = useState<Projector>(projector);
 
+  const availableIpAddresses = rows.map((row: any) => row.original.ip);
   const onEditProjector = async (projector: Projector) => {
     const response: Response = await fetch(`${getBaseURL()}/api/projectors`, {
       method: 'PUT',
@@ -44,7 +54,14 @@ export default function EditProjectorForm({ projector }: { projector: Projector 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically validate the IP is unique
+    if (availableIpAddresses.includes(formData.ip)) {
+      toast({
+        title: 'Dirección IP duplicada',
+        description: 'La dirección IP ingresada ya está en uso por otro proyector.',
+        variant: 'destructive',
+      });
+      return;
+    }
     onEditProjector(formData);
     setOpen(false);
     toast({
@@ -55,11 +72,6 @@ export default function EditProjectorForm({ projector }: { projector: Projector 
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant='outline'>
-          <span>Editar Proyector</span>
-        </Button>
-      </DialogTrigger>
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
           <DialogTitle>Editar Proyector Existente</DialogTitle>
@@ -98,7 +110,7 @@ export default function EditProjectorForm({ projector }: { projector: Projector 
               type='number'
               value={formData.horasLampara}
               onChange={handleInputChange}
-              required
+              disabled
             />
           </div>
           <div className='space-y-2'>
@@ -122,7 +134,7 @@ export default function EditProjectorForm({ projector }: { projector: Projector 
           </div>
           <div className='space-y-2'>
             <Label htmlFor='estado'>Estado</Label>
-            <Select name='estado' value={formData.estado} onValueChange={handleSelectChange}>
+            <Select name='estado' value={formData.estado} onValueChange={handleSelectChange} disabled>
               <SelectTrigger>
                 <SelectValue placeholder='Seleccione el estado' />
               </SelectTrigger>

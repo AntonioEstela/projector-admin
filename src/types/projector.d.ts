@@ -9,4 +9,5 @@ export type Projector = {
   etiquetas: string[];
   ubicacion: string;
   estado: 'Encendido' | 'Apagado' | 'En mantenimiento';
+  temperatura: number;
 };

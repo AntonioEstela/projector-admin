@@ -27,7 +27,7 @@ export default function ResetPasswordForm() {
     }
 
     try {
-      const res = await fetch(`/api/auth/request-reset`, {
+      const res = await fetch('/api/auth/request-reset', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,7 +57,8 @@ export default function ResetPasswordForm() {
     }
 
     try {
-      const res = await fetch(`/api/auth/validate-reset-code`, {
+      console.log(resetCode);
+      const res = await fetch('/api/auth/validate-reset-code', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,38 +78,17 @@ export default function ResetPasswordForm() {
     }
   };
 
-  const validatePassword = (password: string) => {
-    const errors = [];
-    if (password.length < 8) {
-      errors.push('La contraseña debe tener al menos 8 caracteres.');
-    }
-    if (!/[A-Z]/.test(password)) {
-      errors.push('La contraseña debe contener al menos una letra mayúscula.');
-    }
-    if (!/[a-z]/.test(password)) {
-      errors.push('La contraseña debe contener al menos una letra minúscula.');
-    }
-    if (!/[0-9]/.test(password)) {
-      errors.push('La contraseña debe contener al menos un número.');
-    }
-    if (!/[!@#$%^&*]/.test(password)) {
-      errors.push('La contraseña debe contener al menos un carácter especial (!@#$%^&*).');
-    }
-    return errors;
-  };
-
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    const passwordErrors = validatePassword(newPassword);
-    if (passwordErrors.length > 0) {
-      setError(passwordErrors.join(' '));
+    if (newPassword !== confirmPassword) {
+      setError('Las contraseñas no coinciden.');
       return;
     }
 
-    if (newPassword !== confirmPassword) {
-      setError('Las contraseñas no coinciden.');
+    if (newPassword.length < 8) {
+      setError('La contraseña debe tener al menos 8 caracteres.');
       return;
     }
 
@@ -205,12 +185,6 @@ export default function ResetPasswordForm() {
                 required
               />
             </div>
-            <ul className='text-sm text-gray-600 list-disc pl-5'>
-              <li>La contraseña debe tener al menos 8 caracteres.</li>
-              <li>Debe contener al menos una letra mayúscula y una minúscula.</li>
-              <li>Debe contener al menos un número.</li>
-              <li>Debe contener al menos un carácter especial (!@#$%^&*).</li>
-            </ul>
             <Button type='submit' className='w-full'>
               Restablecer contraseña
             </Button>
@@ -225,7 +199,7 @@ export default function ResetPasswordForm() {
         )}
       </CardContent>
       <CardFooter className='flex justify-center'>
-        <Button variant='link' onClick={() => router.push('/login')}>
+        <Button variant='link' onClick={() => router.push('/')}>
           Volver al inicio de sesión
         </Button>
       </CardFooter>

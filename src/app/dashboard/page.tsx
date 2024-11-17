@@ -31,7 +31,6 @@ export default function Dashboard() {
   if (loading) {
     return <div>Loading...</div>;
   }
-
   return (
     <div>
       <nav className='flex justify-between items-center py-5 px-10'>

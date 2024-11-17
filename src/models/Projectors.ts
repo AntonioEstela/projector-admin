@@ -11,6 +11,7 @@ export interface IProjector extends Document {
   lampHours: number;
   reference: string;
   groups: string;
+  temperature: number;
 }
 
 const ProjectorSchema = new Schema<IProjector>({
@@ -51,6 +52,10 @@ const ProjectorSchema = new Schema<IProjector>({
   groups: {
     type: String,
     required: true,
+  },
+  temperature: {
+    type: Number,
+    default: 0,
   },
 });
 

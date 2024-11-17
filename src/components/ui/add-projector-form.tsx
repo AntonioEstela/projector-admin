@@ -12,7 +12,7 @@ import { Plus } from 'lucide-react';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { getBaseURL } from '@/lib/utils';
 
-export default function AddProjectorForm() {
+export default function AddProjectorForm({ rows }: { rows: any }) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<Projector>({
     ip: '',
@@ -24,7 +24,9 @@ export default function AddProjectorForm() {
     etiquetas: [],
     ubicacion: '',
     estado: 'Apagado',
+    temperatura: 0,
   });
+  const availableIpAddresses = rows.map((row: any) => row.original.ip);
 
   const onAddProjector = async (projector: Projector) => {
     const response: Response = await fetch(`${getBaseURL()}/api/projectors`, {
@@ -39,8 +41,17 @@ export default function AddProjectorForm() {
     if (response) {
       const data = await response.json();
       console.log('Projector added: ', data);
+      toast({
+        title: 'Proyector añadido',
+        description: 'El nuevo proyector ha sido añadido con éxito.',
+      });
     } else {
       console.error('Failed to add projector');
+      toast({
+        title: 'Error al añadir proyector',
+        description: 'Ha ocurrido un error al añadir el nuevo proyector.',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -55,8 +66,14 @@ export default function AddProjectorForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically validate the IP is unique
-    // For this example, we'll just add the projector
+    if (availableIpAddresses.includes(formData.ip)) {
+      toast({
+        title: 'Dirección IP duplicada',
+        description: 'La dirección IP ingresada ya está en uso por otro proyector.',
+        variant: 'destructive',
+      });
+      return;
+    }
     onAddProjector(formData);
     setOpen(false);
     toast({

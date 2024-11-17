@@ -17,6 +17,7 @@ export function mapToDashboardColum(projector: any) {
     etiquetas: projector.tags,
     ubicacion: projector.location,
     estado: projector.status,
+    temperatura: projector.temperature,
   };
 }
 
@@ -34,3 +35,96 @@ export const isAdmin = () => {
   const user = getUser();
   return user?.role === 'admin';
 };
+
+/**
+ * Parses the temperature response from the projector.
+ * @param response - The hex string response from the projector (e.g., "05 14 00 0A 00 00 00 29 01 00 00 00 00 00 00 48")
+ * @returns The temperature in degrees Celsius.
+ */
+export function parseTemperatureResponse(response: string): number | null {
+  // Split the hex string into an array of byte strings
+  const bytes = response.split(' ').map((byte) => parseInt(byte, 16));
+
+  // Ensure we have enough bytes to parse temperature
+  if (bytes.length < 14) {
+    console.error('Invalid response length');
+    return null;
+  }
+
+  // Extract bytes 7 to 10 (0-indexed as bytes[6] to bytes[9])
+  const tempBytes = bytes.slice(7, 11);
+
+  // Convert to a single integer (ddccbbaa in the format dd cc bb aa)
+  const temperatureHex = tempBytes
+    .reverse()
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+  const temperatureValue = parseInt(temperatureHex, 16);
+
+  // Divide by 10 to get the temperature in degrees Celsius
+  const temperatureCelsius = temperatureValue / 10;
+
+  return temperatureCelsius;
+}
+
+/**
+ * Parses the power status response from the projector.
+ * @param response - The hex string response from the projector (e.g., "05 14 00 03 00 00 00 01 18")
+ * @returns The power status as a human-readable string.
+ */
+export function parsePowerStatusResponse(response: string): string | null {
+  // Split the hex string into an array of byte strings
+  const bytes = response.split(' ').map((byte) => parseInt(byte, 16));
+
+  // Ensure we have enough bytes to parse power status
+  if (bytes.length < 8) {
+    console.error('Invalid response length');
+    return null;
+  }
+
+  // Byte 7 (index 6 in 0-based index) contains the power status
+  const powerStatusByte = bytes[7];
+
+  // Interpret the power status byte
+  switch (powerStatusByte) {
+    case 0x00:
+      return 'Apagado';
+    case 0x01:
+      return 'Encendido';
+    case 0x02:
+      return 'Encendido';
+    case 0x03:
+      return 'Apagado';
+    default:
+      return 'En Mantenimiento';
+  }
+}
+
+/**
+ * Parses the lamp usage hours from the projector's response.
+ * @param response - The hex string response from the projector (e.g., "05 14 00 06 00 00 00 B8 0B 00 00 DD")
+ * @returns The lamp usage time in hours.
+ */
+export function parseLampUsageResponse(response: string): number | null {
+  // Split the hex string into an array of bytes
+  console.log(response);
+  const bytes = response.split(' ').map((byte) => parseInt(byte, 16));
+
+  // Ensure we have enough bytes to parse the lamp usage
+  if (bytes.length < 12) {
+    console.error('Invalid response length');
+    return null;
+  }
+
+  // Extract bytes 7 to 10 (0-indexed as bytes[6] to bytes[9])
+  const usageBytes = bytes.slice(7, 11);
+
+  // Convert to a single integer (ddccbbaa format in little-endian)
+  const usageHex = usageBytes
+    .reverse()
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('');
+  const usageHours = parseInt(usageHex, 16);
+
+  return usageHours;
+}

@@ -7,6 +7,8 @@ export interface IUser extends Document {
   firstName: string;
   lastName: string;
   role: string;
+  resetPasswordCode?: number;
+  resetPasswordExpires?: number;
   comparePassword: (candidatePassword: string) => Promise<boolean>;
 }
 
@@ -34,6 +36,8 @@ const UserSchema = new mongoose.Schema<IUser>({
     type: String,
     default: 'user',
   },
+  resetPasswordCode: { type: String },
+  resetPasswordExpires: { type: String },
 });
 
 UserSchema.pre('save', async function (next) {

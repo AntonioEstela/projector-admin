@@ -15,8 +15,12 @@ import { ChevronDown, ChevronsUpDown, ChevronUp, MoreHorizontal } from 'lucide-r
 import { DropdownMenuCheckboxes } from '@/components/ui/dropdown-menu-checkboxes';
 import React, { useState } from 'react';
 import { getBaseURL } from '@/lib/utils';
+import COMMANDS from '@/lib/constants';
+import { Checkbox } from '@/components/ui/checkbox';
+import { toast } from '@/hooks/use-toast';
 
 export type DashboardColumn = {
+  select: boolean;
   id: string;
   ip: string;
   nombre: string;
@@ -27,43 +31,136 @@ export type DashboardColumn = {
   etiquetas: Array<string>;
   ubicacion: string;
   estado: 'Encendido' | 'Apagado' | 'En mantenimiento';
+  temperatura: number;
 };
 
-const ActionsMenu = ({ row }: { row: Row<DashboardColumn> }) => {
-  const { estado } = row.original;
+const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; selectedRows?: DashboardColumn[] }) => {
+  const { estado, ip } = row?.original ?? { estado: '', ip: '' };
   // logica para eliminar el proyector o editarlo
 
   const handleDelete = async () => {
-    await fetch(`${getBaseURL()}/api/projectors`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify(row.original.id),
+    try {
+      const response = await fetch(`${getBaseURL()}/api/projectors`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify(row?.original.id),
+      });
+
+      if (response.ok) {
+        toast({
+          title: 'Proyector eliminado',
+          description: 'El proyector ha sido eliminado exitosamente.',
+        });
+      } else {
+        throw new Error('Failed to delete projector');
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'No se pudo eliminar el proyector.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleOnOFF = async (host: string, command: string, port = '8080') => {
+    toast({
+      title: 'Enviando comando',
+      description: 'Enviando comando al proyector...',
+    });
+
+    try {
+      const res = await fetch('/api/projectors/sendCommand', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ host, port, command }),
+      });
+
+      const data = await res.json();
+      if (data.status === 'success') {
+        toast({
+          title: 'Comando enviado',
+          description: `Respuesta del dispositivo: ${data.response}`,
+        });
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Error al enviar el comando',
+        variant: 'destructive',
+      });
+    }
+  };
+  const handleMultipleOnOFF = async (command: string, selectedRows: DashboardColumn[]) => {
+    const selectedIps = selectedRows.map((row) => row.ip);
+    selectedIps.forEach((ip) => {
+      handleOnOFF(ip, command);
     });
   };
 
+  const handleMultipleDelete = async () => {
+    try {
+      const response = await fetch(`${getBaseURL()}/api/projectors`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify(selectedRows?.map((row) => row.id)),
+      });
+
+      if (response.ok) {
+        toast({
+          title: 'Proyectores eliminados',
+          description: 'Los proyectores han sido eliminados exitosamente.',
+        });
+      } else {
+        throw new Error('Failed to delete projectors');
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'No se pudieron eliminar los proyectores.',
+        variant: 'destructive',
+      });
+    }
+  };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant='ghost' className='w-8 h-8 p-0'>
-          <span className='sr-only'>Open menu</span>
           <MoreHorizontal className='w-4 h-4' />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
         <DropdownMenuLabel>Acciones</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {estado === 'Apagado' ? (
-          <DropdownMenuItem>Encender</DropdownMenuItem>
+        {selectedRows?.length ? (
+          <>
+            <DropdownMenuItem onClick={() => handleMultipleOnOFF(COMMANDS.POWER_ON, selectedRows)}>
+              Encender
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleMultipleOnOFF(COMMANDS.POWER_OFF, selectedRows)}>
+              Apagar
+            </DropdownMenuItem>
+          </>
+        ) : estado === 'Apagado' ? (
+          <DropdownMenuItem onClick={() => handleOnOFF(ip, COMMANDS.POWER_ON)}>Encender</DropdownMenuItem>
         ) : estado === 'Encendido' ? (
-          <DropdownMenuItem>Apagar</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleOnOFF(ip, COMMANDS.POWER_OFF)}>Apagar</DropdownMenuItem>
         ) : (
           <DropdownMenuItem disabled>Apagar</DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem className='text-red-500 hover:!text-red-500' onClick={handleDelete}>
+        <DropdownMenuItem
+          className='text-red-500 hover:!text-red-500'
+          onClick={selectedRows?.length ? handleMultipleDelete : handleDelete}
+        >
           Eliminar
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -103,6 +200,20 @@ const SortableHeader = ({ column }: { column: Column<DashboardColumn, unknown> }
 
 export const columns: ColumnDef<DashboardColumn>[] = [
   {
+    accessorKey: 'select',
+    header: ({ table }) => {
+      return (
+        <Checkbox
+          checked={table.getRowModel().rows.every((row) => row.getIsSelected())}
+          onCheckedChange={() => table.toggleAllRowsSelected()}
+        />
+      );
+    },
+    cell: ({ row }) => {
+      return <Checkbox checked={row.getIsSelected()} onCheckedChange={() => row.toggleSelected()} />;
+    },
+  },
+  {
     accessorKey: 'ip',
     header: 'IP',
   },
@@ -135,6 +246,26 @@ export const columns: ColumnDef<DashboardColumn>[] = [
     header: 'Ubicación',
   },
   {
+    accessorKey: 'temperatura',
+    header: 'Temperatura',
+    cell: ({ row }) => {
+      const projector = row.original;
+      return (
+        <span
+          className={`px-2 py-1 text-xs font-semibold rounded-full ${
+            projector.temperatura < 50
+              ? 'bg-green-100 text-green-800'
+              : projector.temperatura < 70
+              ? 'bg-yellow-100 text-yellow-800'
+              : 'bg-red-100 text-red-800'
+          }`}
+        >
+          {projector.temperatura}°C
+        </span>
+      );
+    },
+  },
+  {
     accessorKey: 'estado',
     cell: ({ row }) => {
       const projector = row.original;
@@ -159,7 +290,17 @@ export const columns: ColumnDef<DashboardColumn>[] = [
     },
   },
   {
-    header: 'Acciones',
+    header: ({ table }) => {
+      const selectedRows = table
+        .getRowModel()
+        .rows.filter((row) => row.getIsSelected())
+        .map((row) => row.original);
+
+      if (selectedRows.length) {
+        return <ActionsMenu selectedRows={selectedRows} />;
+      }
+      return 'Acciones';
+    },
     id: 'actions',
     cell: ({ row }) => <ActionsMenu row={row} />,
   },

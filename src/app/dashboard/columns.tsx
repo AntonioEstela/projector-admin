@@ -60,7 +60,7 @@ const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; select
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'No se pudo eliminar el proyector.',
+        description: `No se pudo eliminar el proyector. ${error instanceof Error ? error.message : ''}`,
         variant: 'destructive',
       });
     }
@@ -125,7 +125,7 @@ const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; select
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'No se pudieron eliminar los proyectores.',
+        description: `No se pudieron eliminar los proyectores. ${error instanceof Error ? error.message : ''}`,
         variant: 'destructive',
       });
     }

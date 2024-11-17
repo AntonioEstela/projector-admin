@@ -43,7 +43,7 @@ export default function ResetPasswordForm() {
         setError(data.message || 'Ocurrió un error. Inténtalo nuevamente.');
       }
     } catch (err) {
-      setError('Ocurrió un error. Inténtalo nuevamente.');
+      setError(`Ocurrió un error. Inténtalo nuevamente. ${err}`);
     }
   };
 
@@ -74,7 +74,7 @@ export default function ResetPasswordForm() {
         setError(data.message || 'Código inválido. Inténtalo nuevamente.');
       }
     } catch (err) {
-      setError('Ocurrió un error. Inténtalo nuevamente.');
+      setError(`Ocurrió un error. Inténtalo nuevamente. ${err}`);
     }
   };
 
@@ -109,7 +109,7 @@ export default function ResetPasswordForm() {
         setError(data.message || 'Ocurrió un error. Inténtalo nuevamente.');
       }
     } catch (err) {
-      setError('Ocurrió un error. Inténtalo nuevamente.');
+      setError(`Ocurrió un error. Inténtalo nuevamente. ${err}`);
     }
   };
 

@@ -11,19 +11,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import net from 'net';
 import COMMANDS from '@/lib/constants';
 
-type DbProjector = {
-  _id: string;
-  name: string;
-  projectorModel: string;
-  location: string;
-  ipAddress: string;
-  status: string;
-  lampHours: number;
-  tags: string[];
-  reference: string;
-  groups: string;
-};
-
 async function fetchRealTimeData(host: string, port: number, command: string): Promise<NextResponse> {
   return new Promise((resolve) => {
     // Create a new TCP client

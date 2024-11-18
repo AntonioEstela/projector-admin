@@ -16,6 +16,7 @@ export async function POST(req: Request) {
 
   // Compare the provided password with the stored hashed password
   const isMatch = await bcrypt.compare(password, user.password);
+  console.log(password, user.password, isMatch);
   if (!isMatch) {
     return NextResponse.json({ message: 'Contraseña incorrecta' }, { status: 401 });
   }

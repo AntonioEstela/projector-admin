@@ -12,6 +12,8 @@ export interface IProjector extends Document {
   reference: string;
   groups: string;
   temperature: number;
+  hasSendAlert: boolean;
+  nextAlertDate: Date;
 }
 
 const ProjectorSchema = new Schema<IProjector>({
@@ -56,6 +58,14 @@ const ProjectorSchema = new Schema<IProjector>({
   temperature: {
     type: Number,
     default: 0,
+  },
+  hasSendAlert: {
+    type: Boolean,
+    default: false,
+  },
+  nextAlertDate: {
+    type: Date,
+    default: Date.now,
   },
 });
 

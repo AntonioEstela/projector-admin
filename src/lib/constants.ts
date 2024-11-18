@@ -1,4 +1,4 @@
-const COMMANDS = {
+const COMMANDS: { [key: string]: string } = {
   // Power Control
   POWER_ON: '06 14 00 04 00 34 11 00 00 5D',
   POWER_OFF: '06 14 00 04 00 34 11 01 00 5E',
@@ -21,28 +21,30 @@ const COMMANDS = {
   // Status Queries
   QUERY_POWER_STATUS: '07 14 00 05 00 34 00 00 11 26 84',
   QUERY_INPUT_STATUS: '07 14 00 05 00 34 00 00 13 01 61',
-  SET_INPUT: (input: string) => {
-    switch (input) {
-      case 'HDMI 1':
-        return COMMANDS.INPUT_HDMI_1;
-      case 'HDMI 2':
-        return COMMANDS.INPUT_HDMI_2;
-      case 'HDMI 3':
-        return COMMANDS.INPUT_HDMI_3;
-      case 'VGA':
-        return COMMANDS.INPUT_VGA;
-      case 'DVI':
-        return COMMANDS.INPUT_DVI;
-      case 'Component':
-        return COMMANDS.INPUT_COMPONENT;
-      case 'USB-C':
-        return COMMANDS.INPUT_USB_C;
-      case 'S-Video':
-        return COMMANDS.INPUT_SVIDEO;
-      default:
-        return '';
-    }
-  },
 };
+
+const SET_INPUT = (input: string): string => {
+  switch (input) {
+    case 'HDMI 1':
+      return COMMANDS.INPUT_HDMI_1;
+    case 'HDMI 2':
+      return COMMANDS.INPUT_HDMI_2;
+    case 'HDMI 3':
+      return COMMANDS.INPUT_HDMI_3;
+    case 'VGA':
+      return COMMANDS.INPUT_VGA;
+    case 'DVI':
+      return COMMANDS.INPUT_DVI;
+    case 'Component':
+      return COMMANDS.INPUT_COMPONENT;
+    case 'USB-C':
+      return COMMANDS.INPUT_USB_C;
+    case 'S-Video':
+      return COMMANDS.INPUT_SVIDEO;
+    default:
+      return '';
+  }
+};
+export { COMMANDS, SET_INPUT };
 
 export default COMMANDS;

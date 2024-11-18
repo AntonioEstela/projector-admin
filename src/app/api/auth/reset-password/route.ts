@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import User from '@/models/User';
 import dbConnect from '@/lib/db';
+import { X } from 'lucide-react';
 
 export async function POST(req: Request) {
   const { email, resetCode, newPassword } = await req.json();
@@ -18,8 +19,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: 'Invalid or expired reset code' }, { status: 400 });
   }
 
-  // Hash the new password and save it
-  user.password = await bcrypt.hash(newPassword, 10);
+  user.password = newPassword;
   user.resetPasswordCode = undefined; // Clear the reset code
   user.resetPasswordExpires = undefined; // Clear the expiration timestamp
   await user.save();

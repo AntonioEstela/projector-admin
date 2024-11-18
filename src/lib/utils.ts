@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { Parser } from 'json2csv';
+import { jsPDF } from 'jspdf';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -43,6 +45,7 @@ export const isAdmin = () => {
  */
 export function parseTemperatureResponse(response: string): number | null {
   // Split the hex string into an array of byte strings
+  console.log('parsing temperature', response);
   const bytes = response.split(' ').map((byte) => parseInt(byte, 16));
 
   // Ensure we have enough bytes to parse temperature
@@ -127,4 +130,24 @@ export function parseLampUsageResponse(response: string): number | null {
   const usageHours = parseInt(usageHex, 16);
 
   return usageHours;
+}
+
+export function exportLogsToCSV(data: any[], fields: string[]): string {
+  const parser = new Parser({ fields });
+  return parser.parse(data);
+}
+
+export function exportLogsToPDF(data: any[], title: string): Blob {
+  const doc = new jsPDF();
+  doc.text(title, 10, 10);
+
+  data.forEach((log, index) => {
+    doc.text(
+      `${index + 1}. ${new Date(log.timestamp).toLocaleString()} - ${log.projectorIp} - ${log.type} - ${log.details}`,
+      10,
+      20 + index * 10
+    );
+  });
+
+  return doc.output('blob');
 }

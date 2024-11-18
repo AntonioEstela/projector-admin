@@ -22,6 +22,15 @@ import { DialogTableCell } from '@/components/ui/dialog-table-cell';
 import { useRouter } from 'next/navigation';
 import { isTokenExpired } from '@/lib/jwt';
 import AddProjectorForm from '@/components/ui/add-projector-form';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
+import { exportLogsToCSV, exportLogsToPDF } from '@/lib/utils';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -65,6 +74,44 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
     }
   };
 
+  const downloadCSV = async () => {
+    const response = await fetch('/api/reports/export', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        startDate: '2024-11-01',
+        endDate: '2024-11-09',
+        format: 'csv',
+      }),
+    });
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'report.csv';
+    link.click();
+  };
+
+  const downloadPDF = async () => {
+    const response = await fetch('/api/reports/export', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        startDate: '2024-11-01',
+        endDate: '2024-11-09',
+        format: 'pdf',
+      }),
+    });
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'report.pdf';
+    link.click();
+  };
+
   useEffect(() => {
     const token = localStorage.getItem('token');
 
@@ -89,7 +136,20 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
               <Search className='w-5 h-5' />
             </Button>
           </form>
-          <div>
+          <div className='flex flex-row items-center -mt-10'>
+            <div className='mr-2'>
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button variant={'outline'}>Descargar Reportes</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuLabel>Descargar como</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={downloadPDF}>PDF</DropdownMenuItem>
+                  <DropdownMenuItem onClick={downloadCSV}>CSV</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <AddProjectorForm rows={table.getRowModel().rows} />
           </div>
         </div>

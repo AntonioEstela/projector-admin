@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
 import User from '@/models/User';
 import dbConnect from '@/lib/db';
-import { X } from 'lucide-react';
 
 export async function POST(req: Request) {
   const { email, resetCode, newPassword } = await req.json();

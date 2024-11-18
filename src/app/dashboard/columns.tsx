@@ -18,7 +18,6 @@ import { getBaseURL } from '@/lib/utils';
 import COMMANDS from '@/lib/constants';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/hooks/use-toast';
-import { Projector } from '@/types/projector';
 
 export type DashboardColumn = {
   select: boolean;

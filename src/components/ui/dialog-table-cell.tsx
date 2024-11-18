@@ -5,9 +5,11 @@ import { Button } from './button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import { convertTo24HourTime, calculateMillisecondsUntil } from '@/lib/timeHelpers';
-import COMMANDS from '@/lib/constants';
+import COMMANDS, { SET_INPUT } from '@/lib/constants';
 import EditProjectorForm from './edit-projector-form';
 import { Separator } from './separator';
+import ProjectorMaintenanceForm, { MaintenanceRecord } from './projector-maintenance-form';
+import ProjectorMaintenanceLogsDialog from './projector-maintenance-logs';
 
 export const DialogTableCell = ({
   isRowOpen,
@@ -119,7 +121,7 @@ export const DialogTableCell = ({
     fetch('/api/projectors/sendCommand', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ host, port: 8080, command: COMMANDS.SET_INPUT(input) }),
+      body: JSON.stringify({ host, port: 8080, command: SET_INPUT(input) }),
     })
       .then((res) => {
         if (res.ok) {
@@ -145,10 +147,24 @@ export const DialogTableCell = ({
       });
   };
 
+  const onAddMaintenance = async ({ projectorIp, maintainedBy, description, date }: MaintenanceRecord) => {
+    const response = await fetch('/api/maintenance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projectorIp, maintainedBy, description, date }),
+    });
+
+    if (response.ok) {
+      toast({ title: 'Mantenimiento registrado correctamente' });
+    } else {
+      toast({ title: 'Error al registrar mantenimiento', variant: 'destructive' });
+    }
+  };
+
   return (
     <>
       <Dialog open={isRowOpen} onOpenChange={setIsRowOpen}>
-        <DialogContent className='sm:max-w-[425px]'>
+        <DialogContent className='sm:max-w-[500px]'>
           <DialogHeader>
             <DialogTitle>{selectedRow.original.nombre}</DialogTitle>
           </DialogHeader>
@@ -193,6 +209,21 @@ export const DialogTableCell = ({
               </Select>
             </div>
             <Button onClick={() => handleSetInput(input)}>Configurar Entrada</Button>
+            <Separator className='my-5' />
+            <div>
+              <Label className='text-md font-bold'>Mantenimiento</Label>
+              <div className='grid grid-cols-2 gap-2 mt-5'>
+                <ProjectorMaintenanceForm
+                  projectorIp={selectedRow.original.ip}
+                  projectorName={selectedRow.original.name}
+                  onAddMaintenance={onAddMaintenance}
+                />
+                <ProjectorMaintenanceLogsDialog
+                  projectorIp={selectedRow.original.ip}
+                  projectorName={selectedRow.original.name}
+                />
+              </div>
+            </div>
           </div>
           <DialogFooter>
             <Button variant='outline' onClick={() => setEditOpen(true)}>

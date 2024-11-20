@@ -37,44 +37,56 @@ export async function fetchRealTimeData(host: string, port: number, command: str
       );
     }
 
-    // Connect to the device
-    client.connect(port, host, () => {
-      console.log(`Connected to ${host}:${port}`);
-      client.write(commandBuffer);
-    });
+    try {
+      // Connect to the device
+      client.connect(port, host, () => {
+        console.log(`Connected to ${host}:${port}`);
+        client.write(commandBuffer);
+      });
 
-    // Handle data received from the device
-    client.on('data', (data) => {
-      console.log('Received response:', data.toString('hex'));
-      client.destroy(); // Close the connection after receiving data
+      // Handle data received from the device
+      client.on('data', (data) => {
+        client.destroy(); // Close the connection after receiving data
 
-      // Respond to the client with the data
-      resolve(
-        NextResponse.json({
-          status: 'success',
-          response: data.toString('hex'),
-        })
-      );
-    });
+        // Respond to the client with the data
+        resolve(
+          NextResponse.json({
+            status: 'success',
+            response: data.toString('hex'),
+          })
+        );
+      });
 
-    // Handle connection errors
-    client.on('error', (err) => {
-      console.error('Connection error:', err);
-      client.destroy(); // Ensure connection is closed
+      // Handle connection errors
+      client.on('error', (err) => {
+        console.error('Connection error:', err);
+        client.destroy(); // Ensure connection is closed
+        resolve(
+          NextResponse.json(
+            {
+              status: 'error',
+              message: err.message,
+            },
+            { status: 500 }
+          )
+        );
+      });
+
+      // Handle connection closure
+      client.on('close', () => {
+        console.log('Connection closed');
+      });
+    } catch (error) {
+      console.error('Error:', error);
       resolve(
         NextResponse.json(
           {
             status: 'error',
-            message: err.message,
+            message: error,
           },
           { status: 500 }
         )
       );
-    });
-
-    // Handle connection closure
-    client.on('close', () => {
-      console.log('Connection closed');
-    });
+    }
   });
 }

@@ -1,3 +1,4 @@
+import COMMANDS from '@/lib/constants';
 import mongoose, { Model } from 'mongoose';
 
 export interface IEventLog extends mongoose.Document {
@@ -8,7 +9,7 @@ export interface IEventLog extends mongoose.Document {
 
 const EventLogSchema = new mongoose.Schema<IEventLog>({
   projectorIp: { type: String, required: true },
-  eventType: { type: String, enum: ['POWER_ON', 'POWER_OFF'], required: true },
+  eventType: { type: String, enum: Object.keys(COMMANDS), required: true },
   timestamp: { type: Date, default: Date.now },
 });
 

@@ -17,7 +17,7 @@ import {
 } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { RefreshCcw, Search } from 'lucide-react';
 import { DialogTableCell } from '@/components/ui/dialog-table-cell';
 import { useRouter } from 'next/navigation';
 import { isTokenExpired } from '@/lib/jwt';
@@ -34,9 +34,10 @@ import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  handleRefreshDashboard: () => void;
 }
 
-export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) => {
+export const DataTable = <TData, TValue>({ columns, data, handleRefreshDashboard }: DataTableProps<TData, TValue>) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState<any>();
   const [search, setSearch] = React.useState<string>('');
@@ -46,6 +47,7 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const table = useReactTable({
     columns,
@@ -136,6 +138,20 @@ export const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData
             </Button>
           </form>
           <div className='flex flex-row items-center -mt-10'>
+            <Button
+              variant='outline'
+              size='icon'
+              onClick={() => {
+                setIsLoading(true);
+                handleRefreshDashboard();
+                setIsLoading(false);
+              }}
+              disabled={isLoading}
+              aria-label='Refresh'
+              className='mr-2'
+            >
+              <RefreshCcw className='h-4 w-4' />
+            </Button>
             <div className='mr-2'>
               <DropdownMenu>
                 <DropdownMenuTrigger>

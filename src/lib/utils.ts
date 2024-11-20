@@ -46,10 +46,11 @@ export const isAdmin = () => {
 export function parseTemperatureResponse(response: string): number | null {
   // Split the hex string into an array of byte strings
   console.log('parsing temperature', response);
-  const bytes = response.split(' ').map((byte) => parseInt(byte, 16));
+  const sanitizedResponse = response.replace(/\s+/g, '');
+  const bytes = sanitizedResponse.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16));
 
   // Ensure we have enough bytes to parse temperature
-  if (bytes.length < 14) {
+  if (!bytes || bytes.length < 14) {
     console.error('Invalid response length');
     return null;
   }
@@ -72,16 +73,19 @@ export function parseTemperatureResponse(response: string): number | null {
 
 /**
  * Parses the power status response from the projector.
- * @param response - The hex string response from the projector (e.g., "05 14 00 03 00 00 00 01 18")
+ * @param response - The raw hex string response from the projector.
  * @returns The power status as a human-readable string.
  */
 export function parsePowerStatusResponse(response: string): string | null {
-  // Split the hex string into an array of byte strings
-  const bytes = response.split(' ').map((byte) => parseInt(byte, 16));
+  // Remove spaces if any and split the hex string into byte pairs
+  if (!response) {
+    throw new Error('Empty power status response');
+  }
+  const sanitizedResponse = response.replace(/\s+/g, '');
+  const bytes = sanitizedResponse.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16));
 
-  // Ensure we have enough bytes to parse power status
-  if (bytes.length < 8) {
-    console.error('Invalid response length');
+  if (!bytes || bytes.length < 8) {
+    console.error('Invalid response length or format');
     return null;
   }
 
@@ -110,11 +114,12 @@ export function parsePowerStatusResponse(response: string): string | null {
  */
 export function parseLampUsageResponse(response: string): number | null {
   // Split the hex string into an array of bytes
-  console.log(response);
-  const bytes = response.split(' ').map((byte) => parseInt(byte, 16));
+  console.log('parsing lamp usage', response);
+  const sanitizedResponse = response.replace(/\s+/g, '');
+  const bytes = sanitizedResponse.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16));
 
   // Ensure we have enough bytes to parse the lamp usage
-  if (bytes.length < 12) {
+  if (!bytes || bytes.length < 12) {
     console.error('Invalid response length');
     return null;
   }

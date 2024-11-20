@@ -7,11 +7,16 @@ import { getBaseURL } from '@/lib/utils';
 import { AvatarDropdown } from '@/components/ui/avatar-dropdown';
 import { Separator } from '@/components/ui/separator';
 import { LayoutDashboard } from 'lucide-react';
+import LoadingSkeleton from '@/components/ui/loading-skeleton';
 
-async function fetchDashboardData() {
+async function fetchDashboardData(
+  setData: React.Dispatch<React.SetStateAction<any[]>>,
+  setIsRefreshing: React.Dispatch<React.SetStateAction<boolean>> = () => {}
+) {
+  setIsRefreshing(true);
   const projectors = await fetch(`${getBaseURL()}/api/projectors`).then((res) => res.json());
-
-  return projectors;
+  setData(projectors);
+  setIsRefreshing(false);
 }
 
 export default function Dashboard() {
@@ -19,18 +24,28 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Initial data fetch
     async function getData() {
-      const fetchedData = await fetchDashboardData();
-      setData(fetchedData);
+      await fetchDashboardData(setData);
       setLoading(false);
     }
 
     getData();
+
+    // Set up interval for periodic updates
+    const interval = setInterval(() => {
+      console.log('Refreshing data...');
+      fetchDashboardData(setData);
+    }, 60000); // 1-minute interval (60000ms)
+
+    // Cleanup the interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingSkeleton />;
   }
+
   return (
     <div>
       <nav className='flex justify-between items-center py-5 px-10'>
@@ -42,7 +57,7 @@ export default function Dashboard() {
         </div>
         <AvatarDropdown />
       </nav>
-      <DataTable data={data} columns={columns} />;
+      <DataTable data={data} columns={columns} handleRefreshDashboard={() => fetchDashboardData(setData, setLoading)} />
     </div>
   );
 }

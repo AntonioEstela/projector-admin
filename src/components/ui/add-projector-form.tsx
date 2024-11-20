@@ -11,6 +11,7 @@ import { Projector } from '@/types/projector';
 import { Plus } from 'lucide-react';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { getBaseURL } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 export default function AddProjectorForm({ rows }: { rows: any }) {
   const [open, setOpen] = useState(false);
@@ -27,7 +28,7 @@ export default function AddProjectorForm({ rows }: { rows: any }) {
     temperatura: 0,
   });
   const availableIpAddresses = rows.map((row: any) => row.original.ip);
-
+  const router = useRouter();
   const onAddProjector = async (projector: Projector) => {
     const response: Response = await fetch(`${getBaseURL()}/api/projectors`, {
       method: 'POST',
@@ -45,6 +46,7 @@ export default function AddProjectorForm({ rows }: { rows: any }) {
         title: 'Proyector añadido',
         description: 'El nuevo proyector ha sido añadido con éxito.',
       });
+      router.push('/');
     } else {
       console.error('Failed to add projector');
       toast({

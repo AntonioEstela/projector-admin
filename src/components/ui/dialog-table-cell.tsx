@@ -29,6 +29,11 @@ export const DialogTableCell = ({
   const [toPeriod, setToPeriod] = useState('PM');
   const [input, setInput] = useState('HDMI 1');
 
+  const isProjectorDisabled =
+    selectedRow.original.estado === 'En mantenimiento' ||
+    selectedRow.original.estado === 'Apagado' ||
+    selectedRow.original.estado === 'No Disponible';
+
   const handleSetTime = () => {
     const fromTime = convertTo24HourTime(fromHour, fromMinute, fromPeriod);
     const toTime = convertTo24HourTime(toHour, toMinute, toPeriod);
@@ -64,6 +69,7 @@ export const DialogTableCell = ({
           description: 'El proyector ha sido encendido exitosamente.',
         });
         console.log(`Response from device: ${data.response}`);
+        handleSetInput(input);
       } else {
         toast({
           title: 'Error',
@@ -188,11 +194,13 @@ export const DialogTableCell = ({
               setMinute={setToMinute}
               setPeriod={setToPeriod}
             />
-            <Button onClick={handleSetTime}>Configurar Tiempo</Button>
+            <Button onClick={handleSetTime} disabled={isProjectorDisabled}>
+              Configurar Tiempo
+            </Button>
             <Separator className='my-5' />
             <div className='flex flex-col space-y-1.5'>
               <Label htmlFor='input'>Entrada del Proyector</Label>
-              <Select value={input} onValueChange={setInput}>
+              <Select value={input} onValueChange={setInput} disabled={isProjectorDisabled}>
                 <SelectTrigger id='input'>
                   <SelectValue placeholder='Select input' />
                 </SelectTrigger>
@@ -208,7 +216,9 @@ export const DialogTableCell = ({
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => handleSetInput(input)}>Configurar Entrada</Button>
+            <Button onClick={() => handleSetInput(input)} disabled={isProjectorDisabled}>
+              Configurar Entrada
+            </Button>
             <Separator className='my-5' />
             <div>
               <Label className='text-md font-bold'>Mantenimiento</Label>

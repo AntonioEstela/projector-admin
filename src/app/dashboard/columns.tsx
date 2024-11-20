@@ -18,6 +18,7 @@ import { getBaseURL } from '@/lib/utils';
 import COMMANDS from '@/lib/constants';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 export type DashboardColumn = {
   select: boolean;
@@ -37,7 +38,7 @@ export type DashboardColumn = {
 const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; selectedRows?: DashboardColumn[] }) => {
   const { estado, ip } = row?.original ?? { estado: '', ip: '' };
   // logica para eliminar el proyector o editarlo
-
+  const router = useRouter();
   const handleDelete = async () => {
     try {
       const response = await fetch(`${getBaseURL()}/api/projectors`, {
@@ -54,6 +55,7 @@ const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; select
           title: 'Proyector eliminado',
           description: 'El proyector ha sido eliminado exitosamente.',
         });
+        router.push('/');
       } else {
         throw new Error('Failed to delete projector');
       }
@@ -85,6 +87,7 @@ const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; select
           title: 'Comando enviado',
           description: `Respuesta del dispositivo: ${data.response}`,
         });
+        setTimeout(() => router.push('/'), 1000);
       } else {
         throw new Error(data.message);
       }
@@ -118,6 +121,7 @@ const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; select
           title: 'Proyectores eliminados',
           description: 'Los proyectores han sido eliminados exitosamente.',
         });
+        router.push('/');
       } else {
         throw new Error('Failed to delete projectors');
       }
@@ -252,7 +256,9 @@ export const columns: ColumnDef<DashboardColumn>[] = [
       return (
         <span
           className={`px-2 py-1 text-xs font-semibold rounded-full ${
-            projector.temperatura < 50
+            projector.temperatura == 0
+              ? 'bg-gray-100 text-gray-800'
+              : projector.temperatura < 50
               ? 'bg-green-100 text-green-800'
               : projector.temperatura < 70
               ? 'bg-yellow-100 text-yellow-800'
@@ -277,6 +283,8 @@ export const columns: ColumnDef<DashboardColumn>[] = [
               ? 'bg-red-100 text-red-800'
               : projector.estado === 'En mantenimiento'
               ? 'bg-yellow-100 text-yellow-800'
+              : projector.estado === 'No Disponible'
+              ? 'bg-gray-100 text-gray-800'
               : ''
           }`}
         >

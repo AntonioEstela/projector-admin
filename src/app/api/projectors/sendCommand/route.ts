@@ -19,29 +19,34 @@ export async function POST(req: Request): Promise<Response> {
     // Convert command from hexadecimal string to Buffer
     const commandBuffer = Buffer.from(command.replace(/\s+/g, ''), 'hex');
 
-    // Connect to the device
-    client.connect(port, host, () => {
-      console.log(`Connected to ${host}:${port}`);
-      client.write(commandBuffer);
-    });
+    try {
+      // Connect to the device
+      client.connect(port, host, () => {
+        console.log(`Connected to ${host}:${port}`);
+        client.write(commandBuffer);
+      });
 
-    // Handle data received from the device
-    client.on('data', (data) => {
-      console.log(`Received data: ${data}`);
-      client.destroy(); // Close the connection
-      resolve(new Response('Command sent successfully', { status: 200 }));
-    });
+      // Handle data received from the device
+      client.on('data', (data) => {
+        console.log(`Received data: ${data}`);
+        client.destroy(); // Close the connection
+        resolve(new Response('Command sent successfully', { status: 200 }));
+      });
 
-    // Handle connection errors
-    client.on('error', (err) => {
-      console.error(`Connection error: ${err.message}`);
-      client.destroy(); // Close the connection
+      // Handle connection errors
+      client.on('error', (err) => {
+        console.error(`Connection error: ${err.message}`);
+        client.destroy(); // Close the connection
+        reject(new Response('Failed to send command', { status: 500 }));
+      });
+
+      // Handle connection close
+      client.on('close', () => {
+        console.log('Connection closed');
+      });
+    } catch (error) {
+      console.error(`Error sending command: ${error}`);
       reject(new Response('Failed to send command', { status: 500 }));
-    });
-
-    // Handle connection close
-    client.on('close', () => {
-      console.log('Connection closed');
-    });
+    }
   });
 }

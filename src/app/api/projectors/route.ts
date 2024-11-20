@@ -19,35 +19,62 @@ export async function GET() {
     await dbConnect();
 
     const projectors = await Projector.find();
+
     const projectorData = await Promise.all(
       projectors.map(async (projector) => {
-        console.log(projector);
+        let temperatureResponse, lampHoursResponse;
+
+        // Fetch real-time data sequentially
+        console.log('Fetching power status for projector:', projector.ipAddress);
+        const powerStatusResponse = await fetchRealTimeData(projector.ipAddress, 8080, COMMANDS.QUERY_POWER_STATUS)
+          .then((res) => res.json())
+          .then((data) => {
+            console.log('Power status response:', data);
+            return parsePowerStatusResponse(data.response);
+          })
+          .catch((error) => {
+            console.log('Error while fetching power status', error);
+            return null;
+          });
+
+        // Fetch temperature and lamp hours only if the projector is powered on
+        if (powerStatusResponse === 'Encendido') {
+          console.log('Fetching temperature for projector:', projector.ipAddress);
+          temperatureResponse = await fetchRealTimeData(projector.ipAddress, 8080, COMMANDS.GET_TEMPERATURE)
+            .then((res) => res.json())
+            .then((data) => parseTemperatureResponse(data.response))
+            .catch((error) => console.log(error));
+
+          console.log('Fetching lamp hours for projector:', projector.ipAddress);
+          lampHoursResponse = await fetchRealTimeData(projector.ipAddress, 8080, COMMANDS.GET_LAMP_HOURS)
+            .then((res) => res.json())
+            .then((data) => parseLampUsageResponse(data.response))
+            .catch((error) => console.log(error));
+        }
+
+        // Parse responses
         const realTimeData = {
-          powerStatus: await fetchRealTimeData(projector.ipAddress, 8080, COMMANDS.QUERY_POWER_STATUS)
-            .then((res) => res.json())
-            .then((data) => data.response),
-          temperature: await fetchRealTimeData(projector.ipAddress, 8080, COMMANDS.GET_TEMPERATURE)
-            .then((res) => res.json())
-            .then((data) => data.response),
-          lampHours: await fetchRealTimeData(projector.ipAddress, 8080, COMMANDS.GET_LAMP_HOURS)
-            .then((res) => res.json())
-            .then((data) => data.response),
+          powerStatus: powerStatusResponse ?? 'No Disponible',
+          temperature: temperatureResponse ?? '0',
+          lampHours: lampHoursResponse ?? '0',
         };
 
         const dashboardData = mapToDashboardColum(projector);
-        dashboardData.estado = parsePowerStatusResponse(realTimeData.powerStatus);
-        dashboardData.horasLampara = parseLampUsageResponse(realTimeData.lampHours);
-        dashboardData.temperatura = parseTemperatureResponse(realTimeData.temperature);
+        dashboardData.estado = realTimeData.powerStatus;
+        dashboardData.horasLampara = realTimeData.lampHours;
+        dashboardData.temperatura = realTimeData.temperature;
 
-        console.log(projector.lampHours, dashboardData.horasLampara);
-        if (projector.lampHours !== dashboardData.horasLampara) {
-          await LampUsageLog.create({
-            projectorIp: projector.ipAddress,
-            usageHours: dashboardData.horasLampara,
-          });
+        // Update lamp usage logs
+        if (projector.estado === 'Encendido') {
+          if (projector.lampHours !== dashboardData.horasLampara) {
+            await LampUsageLog.create({
+              projectorIp: projector.ipAddress,
+              usageHours: dashboardData.horasLampara,
+            });
+          }
+
+          await monitorProjectors();
         }
-
-        await monitorProjectors();
         return {
           ...mapToDashboardColum(projector),
           ...dashboardData,
@@ -141,7 +168,10 @@ export async function DELETE(req: NextRequest) {
     await dbConnect();
 
     const ids = await req.json();
-
+    if (typeof ids === 'string') {
+      await Projector.findByIdAndDelete(ids);
+      return NextResponse.json({ message: 'Projector deleted successfully' });
+    }
     ids?.forEach(async (id: string) => {
       await Projector.findByIdAndDelete(id);
     });

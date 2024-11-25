@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from '@/hooks/use-toast';
 import { Projector } from '@/types/projector';
 import { DialogDescription } from '@radix-ui/react-dialog';
-import { getBaseURL } from '@/lib/utils';
 
 export default function EditProjectorForm({
   projector,
@@ -36,7 +35,10 @@ export default function EditProjectorForm({
     });
 
     if (response) {
-      const data = await response.json();
+      toast({
+        title: 'Proyector editado',
+        description: 'El proyector ha sido editado con éxito.',
+      });
     } else {
       console.error('Failed to edit projector');
     }

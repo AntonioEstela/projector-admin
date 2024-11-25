@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { columns, DashboardColumn } from './columns';
 import { DataTable } from './data-table';
-import { getBaseURL } from '@/lib/utils';
 import { AvatarDropdown } from '@/components/ui/avatar-dropdown';
 import { Separator } from '@/components/ui/separator';
 import { LayoutDashboard } from 'lucide-react';

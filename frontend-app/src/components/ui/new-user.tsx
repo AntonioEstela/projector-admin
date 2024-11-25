@@ -8,7 +8,6 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useRouter } from 'next/navigation';
-import { getBaseURL } from '@/lib/utils';
 
 const validatePassword = (password: string): string[] => {
   const errors: string[] = [];

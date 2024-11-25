@@ -17,15 +17,10 @@ export type MaintenanceRecord = {
 
 type ProjectorMaintenanceFormProps = {
   projectorIp: string;
-  projectorName: string;
   onAddMaintenance: (record: MaintenanceRecord) => void;
 };
 
-export default function ProjectorMaintenanceForm({
-  projectorIp,
-  projectorName,
-  onAddMaintenance,
-}: ProjectorMaintenanceFormProps) {
+export default function ProjectorMaintenanceForm({ projectorIp, onAddMaintenance }: ProjectorMaintenanceFormProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<MaintenanceRecord>({
     projectorIp: projectorIp,

@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader } from './card';
 import { isTokenExpired } from '@/lib/jwt';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { getBaseURL } from '@/lib/utils';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');

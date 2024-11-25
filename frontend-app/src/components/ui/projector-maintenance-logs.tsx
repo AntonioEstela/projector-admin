@@ -33,13 +33,7 @@ const fetchMaintenanceLogs = async (
   };
 };
 
-export default function ProjectorMaintenanceLogsDialog({
-  projectorIp,
-  projectorName,
-}: {
-  projectorIp: string;
-  projectorName: string;
-}) {
+export default function ProjectorMaintenanceLogsDialog({ projectorIp }: { projectorIp: string }) {
   const [open, setOpen] = useState(false);
   const [logs, setLogs] = useState<MaintenanceLog[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,7 +71,7 @@ export default function ProjectorMaintenanceLogsDialog({
       </DialogTrigger>
       <DialogContent className='sm:max-w-[800px]'>
         <DialogHeader>
-          <DialogTitle>Registros de Mantenimiento para {projectorName}</DialogTitle>
+          <DialogTitle>Registros de Mantenimiento o Novedad</DialogTitle>
         </DialogHeader>
         <div className='space-y-4'>
           <Table>

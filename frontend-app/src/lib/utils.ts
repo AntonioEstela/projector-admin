@@ -145,15 +145,52 @@ export function exportLogsToCSV(data: any[], fields: string[]): string {
 
 export function exportLogsToPDF(data: any[], title: string): Blob {
   const doc = new jsPDF();
+
+  // Set smaller font size
+  doc.setFontSize(8); // Smaller font size for the content
+
+  // Title
   doc.text(title, 10, 10);
 
-  data.forEach((log, index) => {
-    doc.text(
-      `${index + 1}. ${new Date(log.timestamp).toLocaleString()} - ${log.projectorIp} - ${log.type} - ${log.details}`,
-      10,
-      20 + index * 10
-    );
+  // Column headers
+  const headers = ['Nombre', 'Timestamp', 'IP', 'Tipo', 'Detalles'];
+  const startY = 20; // Starting position for the header
+  const rowHeight = 6; // Adjust row height to fit more content
+
+  // Draw headers (column titles)
+  headers.forEach((header, index) => {
+    doc.text(header, 10 + index * 40, startY); // Adjust space between columns
   });
 
+  // Starting Y position for the first data row
+  let yPos = startY + rowHeight + 5;
+
+  // Draw the log data (Name, Timestamp, IP, Type, Details)
+  data.forEach((log) => {
+    // If the content exceeds the page height (280), add a new page
+    if (yPos > 280) {
+      doc.addPage();
+      yPos = 10; // Reset position for the new page
+
+      // Redraw headers on the new page
+      headers.forEach((header, index) => {
+        doc.text(header, 10 + index * 40, yPos);
+      });
+
+      yPos += rowHeight + 5; // Skip a line after the headers
+    }
+
+    // Add the actual data to the rows
+    doc.text(log.projectorName || 'N/A', 10, yPos); // Projector Name
+    doc.text(new Date(log.timestamp).toLocaleString(), 50, yPos); // Timestamp
+    doc.text(log.projectorIp || 'N/A', 90, yPos); // IP
+    doc.text(log.type || 'N/A', 130, yPos); // Type
+    doc.text(log.details || 'N/A', 170, yPos); // Details
+
+    // Move to the next row position
+    yPos += rowHeight + 5;
+  });
+
+  // Return the generated PDF as a Blob
   return doc.output('blob');
 }

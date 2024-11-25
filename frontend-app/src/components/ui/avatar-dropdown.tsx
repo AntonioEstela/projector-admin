@@ -9,12 +9,8 @@ import {
   DropdownMenuTrigger,
 } from './dropdown-menu';
 import { IUser } from '@/models/User';
-import { getBaseURL, getUser, isAdmin } from '@/lib/utils';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './dialog';
+import { getUser, isAdmin } from '@/lib/utils';
 import { useState } from 'react';
-import { Input } from './input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
-import { Button } from './button';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/hooks/use-toast';
 import { UserManagementDialog } from './user-management-dialog';
@@ -26,7 +22,6 @@ export function AvatarDropdown() {
   const userInitials = `${firstName[0]}${lastName[0]}`;
   const router = useRouter();
   const isUserAdmin = isAdmin();
-  console.log('is user admin', isUserAdmin);
 
   const handleLogout = () => {
     localStorage.removeItem('token');

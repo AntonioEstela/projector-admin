@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
     await newProjector.save();
 
     return NextResponse.json({ message: 'Projector added successfully' });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: 'Invalid or expired token' }, { status: 403 });
   }
 }
@@ -153,7 +153,7 @@ export async function PUT(req: NextRequest) {
     await Projector.findByIdAndUpdate(id, updatedProjector);
 
     return NextResponse.json({ message: 'Projector updated successfully' });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: 'Invalid or expired token' }, { status: 403 });
   }
 }
@@ -174,7 +174,7 @@ export async function DELETE(req: NextRequest) {
     });
 
     return NextResponse.json({ message: 'Projector deleted successfully' });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ message: 'Invalid or expired token' }, { status: 403 });
   }
 }

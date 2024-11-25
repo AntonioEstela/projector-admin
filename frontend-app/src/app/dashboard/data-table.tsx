@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { DataTablePagination } from '@/components/ui/dataTablePagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
@@ -19,8 +19,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { RefreshCcw, Search } from 'lucide-react';
 import { DialogTableCell } from '@/components/ui/dialog-table-cell';
-import { useRouter } from 'next/navigation';
-import { isTokenExpired } from '@/lib/jwt';
 import AddProjectorForm from '@/components/ui/add-projector-form';
 import {
   DropdownMenu,
@@ -30,6 +28,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu';
+import { isAdmin } from '@/lib/utils';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -44,8 +43,6 @@ export const DataTable = <TData, TValue>({ columns, data, handleRefreshDashboard
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [isRowOpen, setIsRowOpen] = useState(false);
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -154,7 +151,7 @@ export const DataTable = <TData, TValue>({ columns, data, handleRefreshDashboard
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <AddProjectorForm rows={table.getRowModel().rows} />
+          {isAdmin() && <AddProjectorForm rows={table.getRowModel().rows} />}
         </div>
       </div>
       <div className='border rounded-md'>

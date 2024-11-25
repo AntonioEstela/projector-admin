@@ -14,11 +14,13 @@ import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronsUpDown, ChevronUp, MoreHorizontal } from 'lucide-react';
 import { DropdownMenuCheckboxes } from '@/components/ui/dropdown-menu-checkboxes';
 import React, { useState } from 'react';
-import { getBaseURL } from '@/lib/utils';
 import COMMANDS from '@/lib/constants';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { TimeScheduler } from '@/components/ui/time-scheduler';
+import { isAdmin } from '@/lib/utils';
 
 export type DashboardColumn = {
   select: boolean;
@@ -37,6 +39,7 @@ export type DashboardColumn = {
 
 const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; selectedRows?: DashboardColumn[] }) => {
   const { estado, ip } = row?.original ?? { estado: '', ip: '' };
+  const [scheduleOpen, setScheduleOpen] = useState(false);
   // logica para eliminar el proyector o editarlo
   const router = useRouter();
   const handleDelete = async () => {
@@ -137,40 +140,53 @@ const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; select
     }
   };
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant='ghost' className='w-8 h-8 p-0'>
-          <MoreHorizontal className='w-4 h-4' />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align='end'>
-        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {selectedRows?.length ? (
-          <>
-            <DropdownMenuItem onClick={() => handleMultipleOnOFF(COMMANDS.POWER_ON, selectedRows)}>
-              Encender
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant='ghost' className='w-8 h-8 p-0'>
+            <MoreHorizontal className='w-4 h-4' />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='end'>
+          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {selectedRows?.length ? (
+            <>
+              <DropdownMenuItem onClick={() => handleMultipleOnOFF(COMMANDS.POWER_ON, selectedRows)}>
+                Encender
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleMultipleOnOFF(COMMANDS.POWER_OFF, selectedRows)}>
+                Apagar
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setScheduleOpen(true)}>Programar Encendido</DropdownMenuItem>
+            </>
+          ) : estado === 'Apagado' ? (
+            <DropdownMenuItem onClick={() => handleOnOFF(ip, COMMANDS.POWER_ON)}>Encender</DropdownMenuItem>
+          ) : estado === 'Encendido' ? (
+            <DropdownMenuItem onClick={() => handleOnOFF(ip, COMMANDS.POWER_OFF)}>Apagar</DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem disabled>Apagar</DropdownMenuItem>
+          )}
+          <DropdownMenuSeparator />
+          {isAdmin() && (
+            <DropdownMenuItem
+              className='text-red-500 hover:!text-red-500'
+              onClick={selectedRows?.length ? handleMultipleDelete : handleDelete}
+            >
+              Eliminar
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleMultipleOnOFF(COMMANDS.POWER_OFF, selectedRows)}>
-              Apagar
-            </DropdownMenuItem>
-          </>
-        ) : estado === 'Apagado' ? (
-          <DropdownMenuItem onClick={() => handleOnOFF(ip, COMMANDS.POWER_ON)}>Encender</DropdownMenuItem>
-        ) : estado === 'Encendido' ? (
-          <DropdownMenuItem onClick={() => handleOnOFF(ip, COMMANDS.POWER_OFF)}>Apagar</DropdownMenuItem>
-        ) : (
-          <DropdownMenuItem disabled>Apagar</DropdownMenuItem>
-        )}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className='text-red-500 hover:!text-red-500'
-          onClick={selectedRows?.length ? handleMultipleDelete : handleDelete}
-        >
-          Eliminar
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {scheduleOpen && (
+        <Dialog open={scheduleOpen} onOpenChange={setScheduleOpen}>
+          <DialogContent>
+            <TimeScheduler selectedRows={selectedRows} />
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 };
 

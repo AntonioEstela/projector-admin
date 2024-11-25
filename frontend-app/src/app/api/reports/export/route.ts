@@ -48,7 +48,7 @@ export async function POST(req: Request) {
         },
       });
     } else if (format === 'pdf') {
-      const pdf = exportLogsToPDF(combinedLogs, 'Combined Logs Report');
+      const pdf = exportLogsToPDF(combinedLogs, 'Reporte de Alertas y Uso');
 
       return new Response(pdf, {
         headers: {

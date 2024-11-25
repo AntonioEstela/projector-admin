@@ -10,7 +10,6 @@ import { toast } from '@/hooks/use-toast';
 import { Projector } from '@/types/projector';
 import { Plus } from 'lucide-react';
 import { DialogDescription } from '@radix-ui/react-dialog';
-import { getBaseURL } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 
 export default function AddProjectorForm({ rows }: { rows: any }) {
@@ -40,7 +39,6 @@ export default function AddProjectorForm({ rows }: { rows: any }) {
     });
 
     if (response) {
-      const data = await response.json();
       toast({
         title: 'Proyector añadido',
         description: 'El nuevo proyector ha sido añadido con éxito.',

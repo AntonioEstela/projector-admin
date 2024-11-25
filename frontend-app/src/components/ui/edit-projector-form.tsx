@@ -26,7 +26,7 @@ export default function EditProjectorForm({
 
   const availableIpAddresses = rows.map((row: any) => row.original.ip);
   const onEditProjector = async (projector: Projector) => {
-    const response: Response = await fetch(`${getBaseURL()}/api/projectors`, {
+    const response: Response = await fetch(`/api/projectors`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

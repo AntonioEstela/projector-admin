@@ -30,7 +30,7 @@ export default function AddProjectorForm({ rows }: { rows: any }) {
   const availableIpAddresses = rows.map((row: any) => row.original.ip);
   const router = useRouter();
   const onAddProjector = async (projector: Projector) => {
-    const response: Response = await fetch(`${getBaseURL()}/api/projectors`, {
+    const response: Response = await fetch(`/api/projectors`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

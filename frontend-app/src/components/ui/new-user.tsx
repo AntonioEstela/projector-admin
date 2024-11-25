@@ -54,7 +54,7 @@ export default function NewUserRegistration() {
       // Aquí iría la lógica para enviar los datos del formulario
 
       const { email, password, nombre, apellido } = Object.fromEntries(formData);
-      const registrationResponse = await fetch(`${getBaseURL()}/api/auth/register`, {
+      const registrationResponse = await fetch(`/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

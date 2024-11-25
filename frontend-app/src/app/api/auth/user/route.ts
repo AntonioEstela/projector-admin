@@ -33,3 +33,33 @@ export async function PUT(req: NextRequest) {
     email: user.email,
   });
 }
+
+export async function DELETE(req: NextRequest) {
+  verifyJWT(req);
+
+  const { email } = await req.json();
+
+  await dbConnect();
+
+  // Find the user in the database
+  const user = await User.findOne({ email });
+  if (!user) {
+    return NextResponse.json({ message: 'Usuario no encontrado' }, { status: 404 });
+  }
+
+  // Delete the user
+  await user.deleteOne();
+
+  return NextResponse.json({ message: 'Usuario eliminado correctamente' });
+}
+
+export async function GET(req: NextRequest) {
+  verifyJWT(req);
+
+  await dbConnect();
+
+  // Get all users from the database
+  const users = await User.find({}, { password: 0 });
+
+  return NextResponse.json(users);
+}

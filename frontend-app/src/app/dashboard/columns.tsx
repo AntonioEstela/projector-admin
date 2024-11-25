@@ -41,7 +41,7 @@ const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; select
   const router = useRouter();
   const handleDelete = async () => {
     try {
-      const response = await fetch(`${getBaseURL()}/api/projectors`, {
+      const response = await fetch(`/api/projectors`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; select
 
   const handleMultipleDelete = async () => {
     try {
-      const response = await fetch(`${getBaseURL()}/api/projectors`, {
+      const response = await fetch(`/api/projectors`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

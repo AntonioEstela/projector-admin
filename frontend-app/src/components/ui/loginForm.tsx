@@ -31,7 +31,7 @@ export default function LoginForm() {
     setError(''); // Clear previous errors
 
     try {
-      const res = await fetch(`${getBaseURL()}/api/auth/login`, {
+      const res = await fetch(`/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

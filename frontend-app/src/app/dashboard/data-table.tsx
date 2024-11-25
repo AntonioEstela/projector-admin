@@ -113,107 +113,95 @@ export const DataTable = <TData, TValue>({ columns, data, handleRefreshDashboard
     link.click();
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-
-    if (!token || isTokenExpired(token)) {
-      // If no token or token is expired, redirect to login page
-      router.push('/');
-    }
-    if (token && !isTokenExpired(token)) setIsAuthenticated(true);
-  }, [router]);
-
   return (
-    isAuthenticated && (
-      <div className='p-10'>
-        <div className='flex flex-row justify-between'>
-          <form onSubmit={handleSearchSubmit} className='flex flex-row w-1/3 mb-10'>
-            <Input
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder='Ingresa algo para buscar...'
-              className='mr-5'
-            />
-            <Button type='submit'>
-              <Search className='w-5 h-5' />
-            </Button>
-          </form>
-          <div className='flex flex-row items-center -mt-10'>
-            <Button
-              variant='outline'
-              size='icon'
-              onClick={() => {
-                setIsLoading(true);
-                handleRefreshDashboard();
-                setIsLoading(false);
-              }}
-              disabled={isLoading}
-              aria-label='Refresh'
-              className='mr-2'
-            >
-              <RefreshCcw className='h-4 w-4' />
-            </Button>
-            <div className='mr-2'>
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button variant={'outline'}>Descargar Reportes</Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>Descargar como</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={downloadPDF}>PDF</DropdownMenuItem>
-                  <DropdownMenuItem onClick={downloadCSV}>CSV</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            <AddProjectorForm rows={table.getRowModel().rows} />
+    <div className='p-10'>
+      <div className='flex flex-row justify-between'>
+        <form onSubmit={handleSearchSubmit} className='flex flex-row w-1/3 mb-10'>
+          <Input
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder='Ingresa algo para buscar...'
+            className='mr-5'
+          />
+          <Button type='submit'>
+            <Search className='w-5 h-5' />
+          </Button>
+        </form>
+        <div className='flex flex-row items-center -mt-10'>
+          <Button
+            variant='outline'
+            size='icon'
+            onClick={() => {
+              setIsLoading(true);
+              handleRefreshDashboard();
+              setIsLoading(false);
+            }}
+            disabled={isLoading}
+            aria-label='Refresh'
+            className='mr-2'
+          >
+            <RefreshCcw className='h-4 w-4' />
+          </Button>
+          <div className='mr-2'>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button variant={'outline'}>Descargar Reportes</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Descargar como</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={downloadPDF}>PDF</DropdownMenuItem>
+                <DropdownMenuItem onClick={downloadCSV}>CSV</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
+          <AddProjectorForm rows={table.getRowModel().rows} />
         </div>
-        <div className='border rounded-md'>
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        data-state={row.getIsSelected() && 'selected'}
-                        onClick={() => handleRowClick(row, cell)}
-                        className={cell.id.includes('ip') ? 'cursor-pointer hover:underline' : ''}
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className='h-24 text-center'>
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-        <div className='mt-6'>
-          <DataTablePagination table={table} />
-        </div>
-        {selectedRow && <DialogTableCell selectedRow={selectedRow} setIsRowOpen={setIsRowOpen} isRowOpen={isRowOpen} />}
       </div>
-    )
+      <div className='border rounded-md'>
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      data-state={row.getIsSelected() && 'selected'}
+                      onClick={() => handleRowClick(row, cell)}
+                      className={cell.id.includes('ip') ? 'cursor-pointer hover:underline' : ''}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className='h-24 text-center'>
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className='mt-6'>
+        <DataTablePagination table={table} />
+      </div>
+      {selectedRow && <DialogTableCell selectedRow={selectedRow} setIsRowOpen={setIsRowOpen} isRowOpen={isRowOpen} />}
+    </div>
   );
 };

@@ -25,6 +25,8 @@ export const TimeScheduler = ({
   const [toHour, setToHour] = useState('05');
   const [toMinute, setToMinute] = useState('00');
   const [toPeriod, setToPeriod] = useState('PM');
+  const [action, setAction] = useState('Encendido y apagado');
+
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const availableProjectors = selectedRows?.length
     ? selectedRows.filter((row: any) => row.estado !== 'No Disponible')
@@ -38,24 +40,33 @@ export const TimeScheduler = ({
   const handleSetTime = () => {
     const fromTime = convertTo24HourTime(fromHour, fromMinute, fromPeriod);
     const toTime = convertTo24HourTime(toHour, toMinute, toPeriod);
+    const url =
+      `${process.env.NEXT_PUBLIC_API_BACKEND_BASE_URL}/schedule` +
+      (action === 'Encendido' ? '/on' : action === 'Apagado' ? '/off' : '');
 
+    const body: any = {
+      ipAddresses,
+      daysOfWeek: selectedDays,
+      input,
+    };
+
+    if (action === 'Encendido y apagado') {
+      body['toTime'] = toTime;
+      body['fromTime'] = fromTime;
+    } else {
+      body['time'] = fromTime;
+    }
     // make a request to the backend to set the time
     try {
-      fetch(`${process.env.NEXT_PUBLIC_API_BACKEND_BASE_URL}/schedule`, {
+      fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ipAddresses,
-          fromTime,
-          toTime,
-          daysOfWeek: selectedDays,
-          input,
-        }),
+        body: JSON.stringify(body),
       }).then(async (res) => {
         if (res.ok) {
           toast({
             title: 'Tiempo configurado',
-            description: `Encendido programado desde ${fromHour}:${fromMinute} ${fromPeriod} hasta ${toHour}:${toMinute} ${toPeriod} los días: ${selectedDays.join(
+            description: `${action} programado desde ${fromHour}:${fromMinute} ${fromPeriod} hasta ${toHour}:${toMinute} ${toPeriod} los días: ${selectedDays.join(
               ', '
             )}`,
           });
@@ -63,7 +74,7 @@ export const TimeScheduler = ({
           const data = await res.json();
           toast({
             title: 'Error',
-            description: `No se pudo programar encendido. ${data.message}`,
+            description: `No se pudo programar ${action}. ${data.message}`,
             variant: 'destructive',
           });
         }
@@ -71,7 +82,7 @@ export const TimeScheduler = ({
     } catch {
       toast({
         title: 'Error',
-        description: `No se pudo programar encendido.`,
+        description: `No se pudo programar ${action}.`,
         variant: 'destructive',
       });
     }
@@ -114,28 +125,47 @@ export const TimeScheduler = ({
   };
   return (
     <>
-      <Label className='text-md font-bold'>Programar encendido</Label>
-      <TimePicker
-        label='Desde'
-        hour={fromHour}
-        minute={fromMinute}
-        period={fromPeriod}
-        setHour={setFromHour}
-        setMinute={setFromMinute}
-        setPeriod={setFromPeriod}
-      />
-      <TimePicker
-        label='Hasta'
-        hour={toHour}
-        minute={toMinute}
-        period={toPeriod}
-        setHour={setToHour}
-        setMinute={setToMinute}
-        setPeriod={setToPeriod}
-      />
+      <Label className='text-md font-bold'>Programar encendido y apagado</Label>
+
+      <div className='flex flex-col space-y-1.5 mb-5'>
+        <Label htmlFor='action'>Acción</Label>
+        <Select value={action} onValueChange={setAction} disabled={isProjectorDisabled}>
+          <SelectTrigger id='action'>
+            <SelectValue placeholder='Select action' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='Encendido y apagado'>Encendido y apagado</SelectItem>
+            <SelectItem value='Encendido'>Encendido</SelectItem>
+            <SelectItem value='Apagado'>Apagado</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className='grid grid-cols-2 gap-4 max-sm:grid-cols-1'>
+        <TimePicker
+          label={action === 'Encendido y apagado' ? 'Desde' : 'A las'}
+          hour={fromHour}
+          minute={fromMinute}
+          period={fromPeriod}
+          setHour={setFromHour}
+          setMinute={setFromMinute}
+          setPeriod={setFromPeriod}
+        />
+        {action === 'Encendido y apagado' && (
+          <TimePicker
+            label='Hasta'
+            hour={toHour}
+            minute={toMinute}
+            period={toPeriod}
+            setHour={setToHour}
+            setMinute={setToMinute}
+            setPeriod={setToPeriod}
+          />
+        )}
+      </div>
       <div className='space-y-2'>
         <Label className='text-md font-bold'>Días de la semana</Label>
-        <div className='flex flex-wrap gap-2'>
+        <div className='flex flex-wrap gap-4 items-center'>
           {daysOfWeek.map((day) => (
             <Button
               key={day}

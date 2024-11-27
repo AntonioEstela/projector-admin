@@ -73,7 +73,7 @@ export default function EditProjectorForm({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className='sm:max-w-[425px]'>
+      <DialogContent className={'sm:max-w-[500px] overflow-y-scroll max-sm:max-h-svh'}>
         <DialogHeader>
           <DialogTitle>Editar Proyector Existente</DialogTitle>
         </DialogHeader>

@@ -39,7 +39,7 @@ export const DialogTableCell = ({
   return (
     <>
       <Dialog open={isRowOpen} onOpenChange={setIsRowOpen}>
-        <DialogContent className='sm:max-w-[500px]'>
+        <DialogContent className={'sm:max-w-[500px] overflow-y-scroll max-sm:max-h-svh'}>
           <DialogHeader>
             <DialogTitle>{selectedRow.original.nombre}</DialogTitle>
           </DialogHeader>
@@ -48,13 +48,13 @@ export const DialogTableCell = ({
             <Separator className='my-5' />
             <div>
               <Label className='text-md font-bold'>Mantenimiento</Label>
-              <div className='grid grid-cols-2 gap-2 mt-5'>
+              <div className='grid grid-cols-2 gap-2 mt-5 max-sm:grid-cols-1'>
                 <ProjectorMaintenanceForm projectorIp={selectedRow.original.ip} onAddMaintenance={onAddMaintenance} />
                 <ProjectorMaintenanceLogsDialog projectorIp={selectedRow.original.ip} />
               </div>
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className='max-sm:gap-4'>
             {isAdmin() && (
               <Button variant='outline' onClick={() => setEditOpen(true)}>
                 Editar Proyector

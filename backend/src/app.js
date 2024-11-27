@@ -119,6 +119,81 @@ app.post('/schedule', async (req, res) => {
   }
 });
 
+// POST Endpoint to schedule either turn on or off
+app.post('/schedule/:action', async (req, res) => {
+  try {
+    const { ipAddresses, time, daysOfWeek, input } = req.body;
+    const { action } = req.params;
+    // Validate input
+    if (!ipAddresses || !ipAddresses.length || !time || !daysOfWeek) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    console.log(`Scheduling ${action} tasks:`, req.body);
+    // Validate if all IPs are valid
+    const projectors = await Projector.find({ ipAddress: { $in: ipAddresses } });
+    if (projectors.length !== ipAddresses.length) {
+      return res.status(404).json({ message: 'One or more projectors not found' });
+    }
+
+    // Validate time format
+    const timeParts = time.split(':');
+    if (timeParts.length !== 2) {
+      return res.status(400).json({ message: 'Invalid time format' });
+    }
+
+    // Parse hours and minutes
+    const [hour, minute] = timeParts.map((val) => parseInt(val, 10));
+
+    // Validate daysOfWeek format
+    const days = daysOfWeek.map((day) => dayMap[day]);
+    if (days.some((day) => day === undefined)) {
+      return res.status(400).json({ message: 'Invalid daysOfWeek format. Use abbreviations like Lu,Ma,Mi.' });
+    }
+
+    // Schedule tasks for all projectors
+    ipAddresses.forEach((ipAddress) => {
+      days.forEach((day) => {
+        const cronExpression = `${minute} ${hour} * * ${day}`;
+        console.log(cronExpression);
+        cron.schedule(cronExpression, async () => {
+          console.log(`Turning ${action === 'on' ? 'ON' : 'OFF'} projector ${ipAddress} on day ${day}`);
+          try {
+            const response = await sendCommand(
+              ipAddress,
+              8080,
+              action === 'on' ? COMMANDS.POWER_ON : COMMANDS.POWER_OFF
+            );
+            console.log(`Projector ${ipAddress} turned ${action === 'on' ? 'ON' : 'OFF'}:`, response);
+
+            // Schedule input change after 30 seconds, if input is provided in the request, by default HDMI 1
+            if (action === 'on') {
+              setTimeout(async () => {
+                try {
+                  await sendCommand(ipAddress, 8080, SET_INPUT(input ?? 'HDMI 1'));
+                } catch (error) {
+                  console.error(`Failed to set input for projector ${ipAddress}, ${error.message}`);
+                  res.status(500).json({ message: `Failed to set input for projector ${ipAddress}, ${error.message}` });
+                }
+              }, 30000);
+            }
+          } catch (error) {
+            console.error(`Failed to turn ${action === 'on' ? 'ON' : 'OFF'} projector ${ipAddress}, ${error.message}`);
+            res.status(500).json({
+              message: `Failed to turn ${action === 'on' ? 'ON' : 'OFF'} projector ${ipAddress}, ${error.message}`,
+            });
+          }
+        });
+      });
+    });
+
+    res.status(200).json({ message: 'Tasks scheduled successfully' });
+  } catch (error) {
+    console.error('Error scheduling tasks:', error);
+    res.status(500).json({ message: 'Failed to schedule tasks' });
+  }
+});
+
 // Start the server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {

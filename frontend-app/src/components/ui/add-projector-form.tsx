@@ -89,7 +89,7 @@ export default function AddProjectorForm({ rows }: { rows: any }) {
           <span>Añadir Proyector</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className='sm:max-w-[425px]'>
+      <DialogContent className={'sm:max-w-[500px] overflow-y-scroll max-sm:max-h-svh'}>
         <DialogHeader>
           <DialogTitle>Añadir Nuevo Proyector</DialogTitle>
         </DialogHeader>

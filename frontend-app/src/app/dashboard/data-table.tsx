@@ -112,8 +112,8 @@ export const DataTable = <TData, TValue>({ columns, data, handleRefreshDashboard
 
   return (
     <div className='p-10'>
-      <div className='flex flex-row justify-between'>
-        <form onSubmit={handleSearchSubmit} className='flex flex-row w-1/3 mb-10'>
+      <div className='flex flex-row justify-between flex-wrap mb-4'>
+        <form onSubmit={handleSearchSubmit} className='flex flex-row w-full md:w-1/3 mb-10'>
           <Input
             onChange={(e) => setSearch(e.target.value)}
             placeholder='Ingresa algo para buscar...'
@@ -123,7 +123,7 @@ export const DataTable = <TData, TValue>({ columns, data, handleRefreshDashboard
             <Search className='w-5 h-5' />
           </Button>
         </form>
-        <div className='flex flex-row items-center -mt-10'>
+        <div className='flex flex-row items-start gap-2'>
           <Button
             variant='outline'
             size='icon'
@@ -134,14 +134,14 @@ export const DataTable = <TData, TValue>({ columns, data, handleRefreshDashboard
             }}
             disabled={isLoading}
             aria-label='Refresh'
-            className='mr-2'
+            className=''
           >
             <RefreshCcw className='h-4 w-4' />
           </Button>
-          <div className='mr-2'>
+          <div className=''>
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <Button variant={'outline'}>Descargar Reportes</Button>
+                <Button variant={'outline'}>Reportes</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuLabel>Descargar como</DropdownMenuLabel>

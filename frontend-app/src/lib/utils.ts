@@ -148,9 +148,9 @@ export function exportLogsToPDF(data: any[], title: string): Blob {
 
   // Set smaller font size
   doc.setFontSize(8); // Smaller font size for the content
-
+  const titleWithDate = `${title}\nGenerado el: ${new Date().toLocaleString()}`;
   // Title
-  doc.text(title, 10, 10);
+  doc.text(titleWithDate, 10, 10);
 
   // Column headers
   const headers = ['Nombre', 'Timestamp', 'IP', 'Tipo', 'Detalles'];

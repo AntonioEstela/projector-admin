@@ -39,7 +39,7 @@ export const DialogTableCell = ({
   return (
     <>
       <Dialog open={isRowOpen} onOpenChange={setIsRowOpen}>
-        <DialogContent className={'sm:max-w-[500px] overflow-y-scroll max-sm:max-h-svh'}>
+        <DialogContent className={'sm:max-w-[500px] overflow-y-auto max-sm:max-h-svh'}>
           <DialogHeader>
             <DialogTitle>{selectedRow.original.nombre}</DialogTitle>
           </DialogHeader>

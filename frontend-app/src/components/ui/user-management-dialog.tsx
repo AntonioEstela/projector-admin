@@ -43,7 +43,7 @@ export function UserManagementDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className={'sm:max-w-[800px] overflow-y-scroll max-sm:max-h-svh'}>
+      <DialogContent className={'sm:max-w-[800px] overflow-y-auto max-sm:max-h-svh'}>
         <DialogHeader>
           <DialogTitle>Usuarios</DialogTitle>
           <DialogDescription>Aquí puedes ver y editar los usuarios de la aplicación.</DialogDescription>

@@ -69,7 +69,7 @@ export default function ProjectorMaintenanceLogsDialog({ projectorIp }: { projec
       <DialogTrigger asChild>
         <Button variant='outline'>Ver Registros de Mantenimiento</Button>
       </DialogTrigger>
-      <DialogContent className={'sm:max-w-[500px] overflow-y-scroll max-sm:max-h-svh'} >
+      <DialogContent className={'sm:max-w-[500px] overflow-y-auto max-sm:max-h-svh'}>
         <DialogHeader>
           <DialogTitle>Registros de Mantenimiento o Novedad</DialogTitle>
         </DialogHeader>

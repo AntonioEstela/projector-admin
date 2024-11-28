@@ -181,7 +181,7 @@ const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; select
       </DropdownMenu>
       {scheduleOpen && (
         <Dialog open={scheduleOpen} onOpenChange={setScheduleOpen}>
-          <DialogContent className={'sm:max-w-[500px] overflow-y-scroll max-sm:max-h-svh'}>
+          <DialogContent className={'sm:max-w-[500px] overflow-y-auto max-sm:max-h-svh'}>
             <TimeScheduler selectedRows={selectedRows} />
           </DialogContent>
         </Dialog>

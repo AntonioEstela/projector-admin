@@ -89,7 +89,7 @@ export default function AddProjectorForm({ rows }: { rows: any }) {
           <span>Añadir Proyector</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className={'sm:max-w-[500px] overflow-y-scroll max-sm:max-h-svh'}>
+      <DialogContent className={'sm:max-w-[500px] overflow-y-auto max-sm:max-h-svh'}>
         <DialogHeader>
           <DialogTitle>Añadir Nuevo Proyector</DialogTitle>
         </DialogHeader>
@@ -132,7 +132,7 @@ export default function AddProjectorForm({ rows }: { rows: any }) {
           </div>
           <div className='space-y-2'>
             <Label htmlFor='grupos'>Grupos</Label>
-            <Input id='grupos' name='grupos' value={formData.grupos} onChange={handleInputChange} />
+            <Input id='grupos' name='grupos' value={formData.grupos} onChange={handleInputChange} required />
           </div>
           <div className='space-y-2'>
             <Label htmlFor='etiquetas'>Etiquetas (separadas por comas)</Label>
@@ -143,11 +143,12 @@ export default function AddProjectorForm({ rows }: { rows: any }) {
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, etiquetas: e.target.value.split(',').map((tag) => tag.trim()) }))
               }
+              required
             />
           </div>
           <div className='space-y-2'>
             <Label htmlFor='ubicacion'>Ubicación</Label>
-            <Input id='ubicacion' name='ubicacion' value={formData.ubicacion} onChange={handleInputChange} />
+            <Input id='ubicacion' name='ubicacion' value={formData.ubicacion} onChange={handleInputChange} required />
           </div>
           <div className='space-y-2'>
             <Label htmlFor='estado'>Estado</Label>

@@ -64,12 +64,21 @@ export const TimeScheduler = ({
         body: JSON.stringify(body),
       }).then(async (res) => {
         if (res.ok) {
-          toast({
-            title: 'Tiempo configurado',
-            description: `${action} programado desde ${fromHour}:${fromMinute} ${fromPeriod} hasta ${toHour}:${toMinute} ${toPeriod} los días: ${selectedDays.join(
-              ', '
-            )}`,
-          });
+          if (action === 'Encendido' || action === 'Apagado') {
+            toast({
+              title: 'Tiempo configurado',
+              description: `${action} programado a las ${fromHour}:${fromMinute} ${fromPeriod} los días: ${selectedDays.join(
+                ', '
+              )}`,
+            });
+          } else {
+            toast({
+              title: 'Tiempo configurado',
+              description: `${action} programado desde ${fromHour}:${fromMinute} ${fromPeriod} hasta ${toHour}:${toMinute} ${toPeriod} los días: ${selectedDays.join(
+                ', '
+              )}`,
+            });
+          }
         } else {
           const data = await res.json();
           toast({

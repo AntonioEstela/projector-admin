@@ -56,7 +56,7 @@ export default function ProjectorMaintenanceForm({ projectorIp, onAddMaintenance
       <DialogTrigger asChild>
         <Button variant='outline'>Registrar Mantenimiento</Button>
       </DialogTrigger>
-      <DialogContent className={'sm:max-w-[500px] overflow-y-scroll max-sm:max-h-svh'}>
+      <DialogContent className={'sm:max-w-[500px] overflow-y-auto max-sm:max-h-svh'}>
         <DialogHeader>
           <DialogTitle>Registrar Mantenimiento o Novedad</DialogTitle>
         </DialogHeader>

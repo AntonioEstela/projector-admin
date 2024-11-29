@@ -35,6 +35,9 @@ export type DashboardColumn = {
   ubicacion: string;
   estado: 'Encendido' | 'Apagado' | 'No Disponible';
   temperatura: number;
+  turnOnAt?: string;
+  turnOffAt?: string;
+  diasProgramados?: Array<string>;
 };
 
 const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; selectedRows?: DashboardColumn[] }) => {

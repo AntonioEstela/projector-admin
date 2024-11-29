@@ -6,6 +6,9 @@ const projectorSchema = new mongoose.Schema({
   status: { type: String },
   lampHours: { type: Number, default: 0 },
   temperature: { type: Number, default: 0 },
+  turnOnAt: { type: String },
+  turnOffAt: { type: String },
+  scheduledDays: { type: Array },
 });
 
 const Projector = mongoose.model('Projector', projectorSchema);

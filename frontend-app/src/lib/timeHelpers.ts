@@ -8,6 +8,13 @@ export function convertTo24HourTime(hour: string, minute: string, period: string
   return `${hours.toString().padStart(2, '0')}:${minute}`;
 }
 
+export function convertTo12HourTime(hour: string): { hour: string; minute: string; period: string } {
+  const [hours, minutes] = hour?.split(':').map(Number);
+  const period = hours < 12 ? 'AM' : 'PM';
+  const displayHours = hours % 12 || 12;
+  return { hour: displayHours?.toString().padStart(2, '0'), minute: minutes?.toString().padStart(2, '0'), period };
+}
+
 export function calculateMillisecondsUntil(time: string, day: string): number {
   const [hours, minutes] = time.split(':').map(Number);
   const now = new Date();

@@ -10,6 +10,8 @@ export function cn(...inputs: ClassValue[]) {
 export function mapToDashboardColum(projector: any) {
   return {
     id: projector._id,
+    turnOnAt: projector.turnOnAt,
+    turnOffAt: projector.turnOffAt,
     ip: projector.ipAddress,
     nombre: projector.name,
     modelo: projector.projectorModel,
@@ -20,6 +22,7 @@ export function mapToDashboardColum(projector: any) {
     ubicacion: projector.location,
     estado: projector.status,
     temperatura: projector.temperature,
+    diasProgramados: projector.scheduledDays,
   };
 }
 

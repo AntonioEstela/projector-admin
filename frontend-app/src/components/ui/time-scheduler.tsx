@@ -2,7 +2,7 @@
 import TimePicker from './time-picker';
 import { Button } from './button';
 import { useState } from 'react';
-import { convertTo24HourTime } from '@/lib/timeHelpers';
+import { convertTo12HourTime, convertTo24HourTime } from '@/lib/timeHelpers';
 import { toast } from '@/hooks/use-toast';
 import { Label } from './label';
 import { Separator } from './separator';
@@ -18,16 +18,18 @@ export const TimeScheduler = ({
   selectedRow?: any;
   selectedRows?: any;
 }) => {
+  const startTime = selectedRow && convertTo12HourTime(selectedRow?.original.turnOnAt);
+  const endTime = selectedRow && convertTo12HourTime(selectedRow?.original.turnOffAt);
   const [input, setInput] = useState('HDMI 1');
-  const [fromHour, setFromHour] = useState('09');
-  const [fromMinute, setFromMinute] = useState('00');
-  const [fromPeriod, setFromPeriod] = useState('AM');
-  const [toHour, setToHour] = useState('05');
-  const [toMinute, setToMinute] = useState('00');
-  const [toPeriod, setToPeriod] = useState('PM');
+  const [fromHour, setFromHour] = useState(startTime?.hour ?? '10');
+  const [fromMinute, setFromMinute] = useState(startTime?.minute ?? '00');
+  const [fromPeriod, setFromPeriod] = useState(startTime?.period ?? 'AM');
+  const [toHour, setToHour] = useState(endTime?.hour ?? '10');
+  const [toMinute, setToMinute] = useState(endTime?.minute ?? '00');
+  const [toPeriod, setToPeriod] = useState(endTime?.period ?? 'PM');
   const [action, setAction] = useState('Encendido y apagado');
 
-  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [selectedDays, setSelectedDays] = useState<string[]>(selectedRow?.original.diasProgramados ?? []);
   const availableProjectors = selectedRows?.length
     ? selectedRows.filter((row: any) => row.estado !== 'No Disponible')
     : selectedRow?.original.estado !== 'No Disponible'
@@ -38,11 +40,17 @@ export const TimeScheduler = ({
   const daysOfWeek = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'];
 
   const handleSetTime = () => {
+    if (!ipAddresses.length) {
+      toast({
+        title: 'Error',
+        description: 'No hay proyectores disponibles para programar.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const fromTime = convertTo24HourTime(fromHour, fromMinute, fromPeriod);
     const toTime = convertTo24HourTime(toHour, toMinute, toPeriod);
-    const url =
-      `${process.env.NEXT_PUBLIC_API_BACKEND_BASE_URL}/schedule` +
-      (action === 'Encendido' ? '/on' : action === 'Apagado' ? '/off' : '');
 
     const body: any = {
       ipAddresses,
@@ -53,12 +61,14 @@ export const TimeScheduler = ({
     if (action === 'Encendido y apagado') {
       body['toTime'] = toTime;
       body['fromTime'] = fromTime;
+    } else if (action === 'Encendido') {
+      body['fromTime'] = fromTime;
     } else {
-      body['time'] = fromTime;
+      body['toTime'] = fromTime;
     }
     // make a request to the backend to set the time
     try {
-      fetch(url, {
+      fetch(`${process.env.NEXT_PUBLIC_API_BACKEND_BASE_URL}/schedule`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
@@ -92,6 +102,45 @@ export const TimeScheduler = ({
       toast({
         title: 'Error',
         description: `No se pudo programar ${action}.`,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleCancelSchedule = () => {
+    if (!ipAddresses.length) {
+      toast({
+        title: 'Error',
+        description: 'No hay proyectores disponibles para cancelar programación.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    // make a request to the backend to cancel the schedule
+    try {
+      fetch(`${process.env.NEXT_PUBLIC_API_BACKEND_BASE_URL}/cancel-schedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ipAddresses }),
+      }).then(async (res) => {
+        if (res.ok) {
+          toast({
+            title: 'Programación cancelada',
+            description: `Se ha cancelado la programación de los proyectores seleccionados.`,
+          });
+        } else {
+          const data = await res.json();
+          toast({
+            title: 'Error',
+            description: `No se pudo cancelar la programación. ${data.message}`,
+            variant: 'destructive',
+          });
+        }
+      });
+    } catch {
+      toast({
+        title: 'Error',
+        description: `No se pudo cancelar la programación.`,
         variant: 'destructive',
       });
     }
@@ -209,6 +258,9 @@ export const TimeScheduler = ({
       )}
       <Button onClick={handleSetTime} disabled={isProjectorDisabled || selectedDays.length === 0}>
         Configurar Tiempo
+      </Button>
+      <Button onClick={handleCancelSchedule} disabled={isProjectorDisabled} variant='destructive'>
+        Cancelar Programación
       </Button>
       {!selectedRows && (
         <>

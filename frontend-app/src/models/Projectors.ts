@@ -1,4 +1,3 @@
-// models/Projector.ts
 import mongoose, { Document, Schema, model } from 'mongoose';
 
 export interface IProjector extends Document {
@@ -14,6 +13,9 @@ export interface IProjector extends Document {
   temperature: number;
   hasSendAlert: boolean;
   nextAlertDate: Date;
+  turnOnAt: string;
+  turnOffAt: string;
+  scheduledDays: string[];
 }
 
 const ProjectorSchema = new Schema<IProjector>({
@@ -66,6 +68,18 @@ const ProjectorSchema = new Schema<IProjector>({
   nextAlertDate: {
     type: Date,
     default: Date.now,
+  },
+  turnOnAt: {
+    type: String,
+    default: '',
+  },
+  turnOffAt: {
+    type: String,
+    default: '',
+  },
+  scheduledDays: {
+    type: [String],
+    default: [],
   },
 });
 

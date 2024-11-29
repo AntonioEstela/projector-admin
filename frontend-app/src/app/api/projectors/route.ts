@@ -74,10 +74,7 @@ export async function GET() {
 
           await monitorProjectors();
         }
-        return {
-          ...mapToDashboardColum(projector),
-          ...dashboardData,
-        };
+        return dashboardData;
       })
     );
 

@@ -31,86 +31,128 @@ const dayMap = {
   Do: 0, // Sunday
 };
 
+// In-memory storage for cron jobs
+const cronJobs = {};
+
 // POST Endpoint for scheduling tasks
 app.post('/schedule', async (req, res) => {
   try {
     const { ipAddresses, fromTime, toTime, daysOfWeek, input } = req.body;
     // Validate input
-    if (!ipAddresses || !ipAddresses.length || !fromTime || !toTime || !daysOfWeek) {
+    if (!ipAddresses || !ipAddresses.length || !daysOfWeek) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    console.log('Scheduling tasks:', req.body);
     // Validate if all IPs are valid
     const projectors = await Projector.find({ ipAddress: { $in: ipAddresses } });
     if (projectors.length !== ipAddresses.length) {
       return res.status(404).json({ message: 'One or more projectors not found' });
     }
 
-    // Validate time format
-    const fromTimeParts = fromTime.split(':');
-    const toTimeParts = toTime.split(':');
-    if (fromTimeParts.length !== 2 || toTimeParts.length !== 2) {
-      return res.status(400).json({ message: 'Invalid time format' });
-    }
-
-    // Parse hours and minutes
-    const [fromHour, fromMinute] = fromTimeParts.map((val) => parseInt(val, 10));
-    const [toHour, toMinute] = toTimeParts.map((val) => parseInt(val, 10));
-
-    // validate that to hour is after from hour
-    if (toHour < fromHour || (toHour === fromHour && toMinute <= fromMinute)) {
-      return res.status(400).json({ message: 'Invalid time range' });
-    }
-
-    // Validate daysOfWeek format
+    // Parse and validate daysOfWeek
     const days = daysOfWeek.map((day) => dayMap[day]);
     if (days.some((day) => day === undefined)) {
       return res.status(400).json({ message: 'Invalid daysOfWeek format. Use abbreviations like Lu,Ma,Mi.' });
     }
 
-    // Schedule turn-on tasks for all projectors
-    ipAddresses.forEach((ipAddress) => {
-      days.forEach((day) => {
-        const cronExpression = `${fromMinute} ${fromHour} * * ${day}`;
-        console.log(cronExpression);
-        cron.schedule(cronExpression, async () => {
-          console.log(`Turning ON projector ${ipAddress} on day ${day}`);
-          try {
-            const response = await sendCommand(ipAddress, 8080, COMMANDS.POWER_ON);
-            console.log(`Projector ${ipAddress} turned ON:`, response);
+    // Schedule turn-on tasks (if fromTime is provided)
+    if (fromTime) {
+      const [fromHour, fromMinute] = fromTime.split(':').map(Number);
 
-            // Schedule input change after 30 seconds, if input is provided in the request, by default HDMI 1
-            setTimeout(async () => {
-              try {
-                await sendCommand(ipAddress, 8080, SET_INPUT(input ?? 'HDMI 1'));
-              } catch (error) {
-                console.error(`Failed to set input for projector ${ipAddress}, ${error.message}`);
-                res.status(500).json({ message: `Failed to set input for projector ${ipAddress}, ${error.message}` });
+      if (fromHour === undefined || fromMinute === undefined) {
+        return res.status(400).json({ message: 'Invalid fromTime format' });
+      }
+
+      // Update database with `turnOnAt` for each projector
+      await Promise.all(
+        ipAddresses.map(async (ip) => {
+          console.log('Updating projector:', ip);
+          const projector = await Projector.findOne({ ipAddress: ip });
+
+          if (projector) {
+            console.log('Projector found, updating turnOnAt:', projector);
+            await Projector.findByIdAndUpdate(projector._id, { turnOnAt: fromTime, scheduledDays: daysOfWeek });
+          } else {
+            console.error(`No projector found with IP: ${ip}`);
+          }
+        })
+      );
+
+      // Schedule the turn-on tasks
+      ipAddresses.forEach((ipAddress) => {
+        days.forEach((day) => {
+          const cronExpression = `${fromMinute} ${fromHour} * * ${day}`;
+          console.log(`Scheduling turn-on task: ${cronExpression} for projector ${ipAddress}`);
+          const job = cron.schedule(cronExpression, async () => {
+            console.log(`Turning ON projector ${ipAddress} on day ${day}`);
+            try {
+              await sendCommand(ipAddress, 8080, COMMANDS.POWER_ON);
+              console.log(`Projector ${ipAddress} turned ON`);
+
+              if (input) {
+                setTimeout(async () => {
+                  console.log(`Setting input for projector ${ipAddress}`);
+                  await sendCommand(ipAddress, 8080, SET_INPUT(input ?? 'HDMI 1'));
+                }, 30000); // Delay for input change
               }
-            }, 30000);
-          } catch (error) {
-            console.error(`Failed to turn ON projector ${ipAddress}, ${error.message}`);
-            res.status(500).json({ message: `Failed to turn ON projector ${ipAddress}, ${error.message}` });
-          }
+            } catch (error) {
+              console.error(`Failed to turn ON projector ${ipAddress}: ${error.message}`);
+            }
+          });
+          // Store the job
+          cronJobs[ipAddress] = cronJobs[ipAddress] || [];
+          cronJobs[ipAddress].push(job);
         });
       });
+    }
 
-      // Schedule turn-off tasks for all projectors
-      days.forEach((day) => {
-        const cronExpression = `${toMinute} ${toHour} * * ${day}`;
-        cron.schedule(cronExpression, async () => {
-          console.log(`Turning OFF projector ${ipAddress} on day ${day}`);
-          try {
-            const response = await sendCommand(ipAddress, 8080, COMMANDS.POWER_OFF);
-            console.log(`Projector ${ipAddress} turned OFF:`, response);
-          } catch (error) {
-            console.error(`Failed to turn OFF projector ${ipAddress}, ${error.message}`);
-            res.status(500).json({ message: `Failed to turn OFF projector ${ipAddress}, ${error.message}` });
+    // Schedule turn-off tasks (if toTime is provided)
+    if (toTime) {
+      const [toHour, toMinute] = toTime.split(':').map(Number);
+
+      if (toHour === undefined || toMinute === undefined) {
+        return res.status(400).json({ message: 'Invalid toTime format' });
+      }
+
+      // Update database with `turnOffAt` for each projector
+      await Promise.all(
+        ipAddresses.map(async (ip) => {
+          console.log('Updating turnOffAt for projector:', ip);
+          const projector = await Projector.findOne({ ipAddress: ip });
+
+          if (projector) {
+            console.log('Projector found, updating turnOffAt:', projector);
+            await Projector.findByIdAndUpdate(projector._id, { turnOffAt: toTime, scheduledDays: daysOfWeek });
+          } else {
+            console.error(`No projector found with IP: ${ip}`);
           }
+        })
+      );
+
+      // Schedule the turn-off tasks
+      ipAddresses.forEach((ipAddress) => {
+        days.forEach((day) => {
+          const cronExpression = `${toMinute} ${toHour} * * ${day}`;
+          console.log(`Scheduling turn-off task: ${cronExpression} for projector ${ipAddress}`);
+          const job = cron.schedule(cronExpression, async () => {
+            console.log(`Turning OFF projector ${ipAddress} on day ${day}`);
+            try {
+              await sendCommand(ipAddress, 8080, COMMANDS.POWER_OFF);
+              console.log(`Projector ${ipAddress} turned OFF`);
+            } catch (error) {
+              console.error(`Failed to turn OFF projector ${ipAddress}: ${error.message}`);
+            }
+          });
+          // Store the job
+          cronJobs[ipAddress] = cronJobs[ipAddress] || [];
+          cronJobs[ipAddress].push(job);
         });
       });
-    });
+    }
+
+    if (!fromTime && !toTime) {
+      return res.status(400).json({ message: 'At least one of fromTime or toTime must be provided' });
+    }
 
     res.status(200).json({ message: 'Tasks scheduled successfully' });
   } catch (error) {
@@ -119,78 +161,38 @@ app.post('/schedule', async (req, res) => {
   }
 });
 
-// POST Endpoint to schedule either turn on or off
-app.post('/schedule/:action', async (req, res) => {
+// POST Endpoint to cancel tasks
+app.post('/cancel-schedule', (req, res) => {
   try {
-    const { ipAddresses, time, daysOfWeek, input } = req.body;
-    const { action } = req.params;
+    const { ipAddresses } = req.body;
+
     // Validate input
-    if (!ipAddresses || !ipAddresses.length || !time || !daysOfWeek) {
+    if (!ipAddresses || !ipAddresses.length) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    console.log(`Scheduling ${action} tasks:`, req.body);
-    // Validate if all IPs are valid
-    const projectors = await Projector.find({ ipAddress: { $in: ipAddresses } });
-    if (projectors.length !== ipAddresses.length) {
-      return res.status(404).json({ message: 'One or more projectors not found' });
-    }
-
-    // Validate time format
-    const timeParts = time.split(':');
-    if (timeParts.length !== 2) {
-      return res.status(400).json({ message: 'Invalid time format' });
-    }
-
-    // Parse hours and minutes
-    const [hour, minute] = timeParts.map((val) => parseInt(val, 10));
-
-    // Validate daysOfWeek format
-    const days = daysOfWeek.map((day) => dayMap[day]);
-    if (days.some((day) => day === undefined)) {
-      return res.status(400).json({ message: 'Invalid daysOfWeek format. Use abbreviations like Lu,Ma,Mi.' });
-    }
-
-    // Schedule tasks for all projectors
-    ipAddresses.forEach((ipAddress) => {
-      days.forEach((day) => {
-        const cronExpression = `${minute} ${hour} * * ${day}`;
-        console.log(cronExpression);
-        cron.schedule(cronExpression, async () => {
-          console.log(`Turning ${action === 'on' ? 'ON' : 'OFF'} projector ${ipAddress} on day ${day}`);
-          try {
-            const response = await sendCommand(
-              ipAddress,
-              8080,
-              action === 'on' ? COMMANDS.POWER_ON : COMMANDS.POWER_OFF
+    ipAddresses.forEach(async (ipAddress) => {
+      if (cronJobs[ipAddress]) {
+        // search the projector in the database and update the turnOnAt and turnOffAt fields to an empty string
+        await Projector.findOne({ ipAddress: ipAddress }).then(async (projector) => {
+          if (projector) {
+            await Projector.findByIdAndUpdate(projector._id, { turnOnAt: '', turnOffAt: '', scheduledDays: [] }).then(
+              () => {
+                console.log(`Updated projector ${ipAddress} with empty turnOnAt and turnOffAt`);
+              }
             );
-            console.log(`Projector ${ipAddress} turned ${action === 'on' ? 'ON' : 'OFF'}:`, response);
-
-            // Schedule input change after 30 seconds, if input is provided in the request, by default HDMI 1
-            if (action === 'on') {
-              setTimeout(async () => {
-                try {
-                  await sendCommand(ipAddress, 8080, SET_INPUT(input ?? 'HDMI 1'));
-                } catch (error) {
-                  console.error(`Failed to set input for projector ${ipAddress}, ${error.message}`);
-                  res.status(500).json({ message: `Failed to set input for projector ${ipAddress}, ${error.message}` });
-                }
-              }, 30000);
-            }
-          } catch (error) {
-            console.error(`Failed to turn ${action === 'on' ? 'ON' : 'OFF'} projector ${ipAddress}, ${error.message}`);
-            res.status(500).json({
-              message: `Failed to turn ${action === 'on' ? 'ON' : 'OFF'} projector ${ipAddress}, ${error.message}`,
-            });
           }
         });
-      });
+        cronJobs[ipAddress].forEach((job) => job.stop()); // Stop all jobs for the IP
+        delete cronJobs[ipAddress]; // Remove from storage
+        console.log(`Cancelled all tasks for projector ${ipAddress}`);
+      }
     });
 
-    res.status(200).json({ message: 'Tasks scheduled successfully' });
+    res.status(200).json({ message: 'Tasks cancelled successfully' });
   } catch (error) {
-    console.error('Error scheduling tasks:', error);
-    res.status(500).json({ message: 'Failed to schedule tasks' });
+    console.error('Error cancelling tasks:', error);
+    res.status(500).json({ message: 'Failed to cancel tasks' });
   }
 });
 

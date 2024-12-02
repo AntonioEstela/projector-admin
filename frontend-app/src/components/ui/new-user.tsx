@@ -8,6 +8,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const validatePassword = (password: string): string[] => {
   const errors: string[] = [];
@@ -75,76 +76,108 @@ export default function NewUserRegistration() {
   };
 
   return (
-    <Card className='w-full max-w-md mx-auto mt-20'>
-      <CardHeader>
-        <CardTitle>Registro de Usuario</CardTitle>
-        <CardDescription>Por favor, completa todos los campos para crear tu cuenta.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className='space-y-4'>
-          <div className='space-y-2'>
-            <Label htmlFor='email'>Correo electrónico</Label>
-            <Input id='email' name='email' type='email' placeholder='tu@ejemplo.com' required />
-          </div>
-          <div className='space-y-2'>
-            <Label htmlFor='nombre'>Nombre</Label>
-            <Input id='nombre' name='nombre' placeholder='Juan' required />
-          </div>
-          <div className='space-y-2'>
-            <Label htmlFor='apellido'>Apellido</Label>
-            <Input id='apellido' name='apellido' placeholder='Pérez' required />
-          </div>
-          <div className='space-y-2'>
-            <Label htmlFor='password'>Contraseña</Label>
-            <Input
-              id='password'
-              name='password'
-              type='password'
-              placeholder='••••••••'
-              required
-              onChange={handlePasswordChange}
-            />
-          </div>
-          <div className='space-y-2'>
-            <Label htmlFor='confirmPassword'>Confirmar contraseña</Label>
-            <Input id='confirmPassword' name='confirmPassword' type='password' placeholder='••••••••' required />
-          </div>
-          <div className='space-y-2'>
-            <div className='flex items-center space-x-2'>
-              <div className='text-sm font-medium'>Fortaleza de la contraseña:</div>
-              <div className='flex space-x-1'>
-                {[1, 2, 3, 4, 5].map((level) => (
-                  <div
-                    key={level}
-                    className={`w-5 h-2 rounded ${level <= passwordStrength ? 'bg-green-500' : 'bg-gray-200'}`}
-                  />
-                ))}
-              </div>
+    <div className='relative min-h-screen flex items-center justify-center'>
+      <Image src='/login-background.png' alt='Login' layout='fill' className='absolute inset-0 z-0 object-cover' />
+      <Card className='w-full max-w-md mx-auto z-10 drop-shadow-lg backdrop-blur-md bg-white/60 border-white/10'>
+        <CardHeader>
+          <CardTitle>Registro de Usuario</CardTitle>
+          <CardDescription className='text-black'>
+            Por favor, completa todos los campos para crear tu cuenta.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className='space-y-4'>
+            <div className='space-y-2'>
+              <Label htmlFor='email'>Correo electrónico</Label>
+              <Input
+                id='email'
+                name='email'
+                type='email'
+                placeholder='tu@ejemplo.com'
+                className='backdrop-blur-sm bg-white/5 border-white/10'
+                required
+              />
             </div>
-            {passwordErrors.length > 0 && (
-              <Alert variant='destructive'>
-                <AlertCircle className='w-4 h-4' />
-                <AlertDescription>
-                  <ul className='list-disc list-inside'>
-                    {passwordErrors.map((error, index) => (
-                      <li key={index}>{error}</li>
-                    ))}
-                  </ul>
-                </AlertDescription>
-              </Alert>
-            )}
-            {passwordErrors.length === 0 && passwordStrength > 0 && (
-              <Alert variant='default' className='text-green-700 border-green-200 bg-green-50'>
-                <CheckCircle2 className='w-4 h-4' />
-                <AlertDescription>La contraseña cumple con todos los requisitos</AlertDescription>
-              </Alert>
-            )}
-          </div>
-          <Button type='submit' className='w-full'>
-            Registrarse
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+            <div className='space-y-2'>
+              <Label htmlFor='nombre'>Nombre</Label>
+              <Input
+                id='nombre'
+                name='nombre'
+                placeholder='Juan'
+                className='backdrop-blur-sm bg-white/5 border-white/10'
+                required
+              />
+            </div>
+            <div className='space-y-2'>
+              <Label htmlFor='apellido'>Apellido</Label>
+              <Input
+                id='apellido'
+                name='apellido'
+                placeholder='Pérez'
+                className='backdrop-blur-sm bg-white/5 border-white/10'
+                required
+              />
+            </div>
+            <div className='space-y-2'>
+              <Label htmlFor='password'>Contraseña</Label>
+              <Input
+                id='password'
+                name='password'
+                type='password'
+                placeholder='••••••••'
+                className='backdrop-blur-sm bg-white/5 border-white/10'
+                required
+                onChange={handlePasswordChange}
+              />
+            </div>
+            <div className='space-y-2'>
+              <Label htmlFor='confirmPassword'>Confirmar contraseña</Label>
+              <Input
+                id='confirmPassword'
+                name='confirmPassword'
+                type='password'
+                placeholder='••••••••'
+                className='backdrop-blur-sm bg-white/5 border-white/10'
+                required
+              />
+            </div>
+            <div className='space-y-2'>
+              <div className='flex items-center space-x-2'>
+                <div className='text-sm font-medium'>Fortaleza de la contraseña:</div>
+                <div className='flex space-x-1'>
+                  {[1, 2, 3, 4, 5].map((level) => (
+                    <div
+                      key={level}
+                      className={`w-5 h-2 rounded ${level <= passwordStrength ? 'bg-green-500' : 'bg-gray-200'}`}
+                    />
+                  ))}
+                </div>
+              </div>
+              {passwordErrors.length > 0 && (
+                <Alert variant='destructive'>
+                  <AlertCircle className='w-4 h-4' />
+                  <AlertDescription>
+                    <ul className='list-disc list-inside'>
+                      {passwordErrors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
+              {passwordErrors.length === 0 && passwordStrength > 0 && (
+                <Alert variant='default' className='text-green-700 border-green-200 bg-green-50'>
+                  <CheckCircle2 className='w-4 h-4' />
+                  <AlertDescription>La contraseña cumple con todos los requisitos</AlertDescription>
+                </Alert>
+              )}
+            </div>
+            <Button type='submit' className='w-full'>
+              Registrarse
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

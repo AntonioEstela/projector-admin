@@ -9,6 +9,7 @@ import { LayoutDashboard } from 'lucide-react';
 import LoadingSkeleton from '@/components/ui/loading-skeleton';
 import { isTokenExpired } from '@/lib/jwt';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 async function fetchDashboardData(
   setData: React.Dispatch<React.SetStateAction<any[]>>,
@@ -62,14 +63,17 @@ export default function Dashboard() {
   return (
     isAuthenticated && (
       <div>
-        <nav className='flex justify-between items-center py-5 px-10'>
-          <div className='flex flex-row items-center'>
-            <LayoutDashboard size={24} strokeWidth={2.5} className='mr-2' />
-            <span className='font-bold text-xl'>Dashboard</span>
-            <Separator orientation='vertical' className='mx-4 h-5' />
-            <span className='text-sm'>Proyectores</span>
+        <nav className='relative'>
+          <Image src='/dashboard-banner.png' alt='Login' layout='fill' className='absolute inset-0 z-0 object-cover' />
+          <div className='flex justify-between items-center py-5 px-10 max-lg:justify-end'>
+            <div className='relative z-10 flex flex-row items-center max-lg:hidden lg:flex'>
+              <LayoutDashboard size={24} strokeWidth={2.5} className='mr-2 text-white' />
+              <span className='font-bold text-xl text-white'>Dashboard</span>
+              <Separator orientation='vertical' className='mx-4 h-5' />
+              <span className='text-sm text-white'>Proyectores</span>
+            </div>
+            <AvatarDropdown />
           </div>
-          <AvatarDropdown />
         </nav>
         <DataTable
           data={data}

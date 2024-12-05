@@ -26,6 +26,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -54,7 +55,7 @@ export default function Dashboard() {
 
     // Cleanup the interval on component unmount
     return () => clearInterval(interval);
-  }, []);
+  }, [isRefreshing]);
 
   if (loading) {
     return <LoadingSkeleton />;
@@ -75,11 +76,7 @@ export default function Dashboard() {
             <AvatarDropdown />
           </div>
         </nav>
-        <DataTable
-          data={data}
-          columns={columns}
-          handleRefreshDashboard={() => fetchDashboardData(setData, setLoading)}
-        />
+        <DataTable data={data} columns={columns} isRefreshing={isRefreshing} setIsRefreshing={setIsRefreshing} />
       </div>
     )
   );

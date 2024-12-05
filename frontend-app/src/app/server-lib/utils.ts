@@ -22,7 +22,7 @@ export async function fetchRealTimeData(host: string, port: number, command: str
           { status: 500 }
         )
       );
-    }, 5000);
+    }, Number(process.env.NEXT_PUBLIC_DEFAULT_TIMEOUT) ?? 3000);
 
     try {
       // Connect to the device
@@ -81,10 +81,4 @@ export async function fetchRealTimeData(host: string, port: number, command: str
       );
     }
   });
-}
-
-export async function fetchWithTimeout<T>(fetchPromise: Promise<T>, timeoutMs: number, fallbackValue: T): Promise<T> {
-  const timeout = new Promise<T>((resolve) => setTimeout(() => resolve(fallbackValue), timeoutMs));
-
-  return Promise.race([fetchPromise, timeout]);
 }

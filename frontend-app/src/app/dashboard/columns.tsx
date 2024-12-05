@@ -38,6 +38,7 @@ export type DashboardColumn = {
   turnOnAt?: string;
   turnOffAt?: string;
   diasProgramados?: Array<string>;
+  etiquetasAsString: string;
 };
 
 const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; selectedRows?: DashboardColumn[] }) => {
@@ -93,7 +94,6 @@ const ActionsMenu = ({ row, selectedRows }: { row?: Row<DashboardColumn>; select
           title: 'Comando enviado',
           description: `Respuesta del dispositivo: ${data.response}`,
         });
-        setTimeout(() => router.push('/'), 1000);
       } else {
         throw new Error(data.message);
       }
@@ -263,7 +263,7 @@ export const columns: ColumnDef<DashboardColumn>[] = [
     header: 'Grupos',
   },
   {
-    accessorKey: 'etiquetas',
+    accessorKey: 'etiquetasAsString',
     header: 'Etiquetas',
   },
   {

@@ -12,7 +12,15 @@ import { Plus } from 'lucide-react';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import { useRouter } from 'next/navigation';
 
-export default function AddProjectorForm({ rows }: { rows: any }) {
+export default function AddProjectorForm({
+  rows,
+  setIsRefreshing,
+  isRefreshing,
+}: {
+  rows: any;
+  setIsRefreshing: any;
+  isRefreshing: any;
+}) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<Projector>({
     ip: '',
@@ -43,7 +51,7 @@ export default function AddProjectorForm({ rows }: { rows: any }) {
         title: 'Proyector añadido',
         description: 'El nuevo proyector ha sido añadido con éxito.',
       });
-      router.push('/');
+      setIsRefreshing(!isRefreshing);
     } else {
       console.error('Failed to add projector');
       toast({

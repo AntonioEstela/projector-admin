@@ -36,7 +36,7 @@ export async function POST(req: Request): Promise<Response> {
           { status: 500 }
         )
       );
-    }, 5000);
+    }, Number(process.env.NEXT_PUBLIC_DEFAULT_TIMEOUT) ?? 3000);
 
     try {
       // Connect to the device

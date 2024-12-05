@@ -17,7 +17,7 @@ export async function sendCommand(host, port, command) {
       console.error('Connection timeout');
       client.destroy();
       reject(new Error('Connection timeout'));
-    }, 5000);
+    }, process.env.DEFAULT_TIMEOUT);
 
     try {
       // Connect to the projector

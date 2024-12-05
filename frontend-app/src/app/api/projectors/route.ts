@@ -10,7 +10,7 @@ import Projector from '@/models/Projectors';
 import { NextRequest, NextResponse } from 'next/server';
 
 import COMMANDS from '@/lib/constants';
-import { fetchRealTimeData, fetchWithTimeout } from '@/app/server-lib/utils';
+import { fetchRealTimeData } from '@/app/server-lib/utils';
 import { monitorProjectors } from '@/app/controllers/projectorMonitor';
 import LampUsageLog from '@/models/LampUsageLog';
 
@@ -33,22 +33,14 @@ export async function GET() {
 
         if (powerStatusResponse === 'Encendido') {
           console.log('Fetching temperature for projector:', projector.ipAddress);
-          temperatureResponse = await fetchWithTimeout(
-            fetchRealTimeData(projector.ipAddress, 8080, COMMANDS.GET_TEMPERATURE)
-              .then((res) => res.json())
-              .then((data) => parseTemperatureResponse(data.response)),
-            5000,
-            0
-          );
+          temperatureResponse = await fetchRealTimeData(projector.ipAddress, 8080, COMMANDS.GET_TEMPERATURE)
+            .then((res) => res.json())
+            .then((data) => parseTemperatureResponse(data.response));
 
           console.log('Fetching lamp hours for projector:', projector.ipAddress);
-          lampHoursResponse = await fetchWithTimeout(
-            fetchRealTimeData(projector.ipAddress, 8080, COMMANDS.GET_LAMP_HOURS)
-              .then((res) => res.json())
-              .then((data) => parseLampUsageResponse(data.response)),
-            5000,
-            0
-          );
+          lampHoursResponse = await fetchRealTimeData(projector.ipAddress, 8080, COMMANDS.GET_LAMP_HOURS)
+            .then((res) => res.json())
+            .then((data) => parseLampUsageResponse(data.response));
         }
 
         // Parse responses

@@ -23,6 +23,7 @@ export function mapToDashboardColum(projector: any) {
     estado: projector.status,
     temperatura: projector.temperature,
     diasProgramados: projector.scheduledDays,
+    etiquetasAsString: projector.tags.join(', '),
   };
 }
 
@@ -49,6 +50,9 @@ export const isAdmin = () => {
 export function parseTemperatureResponse(response: string): number | null {
   // Split the hex string into an array of byte strings
   console.log('parsing temperature', response);
+  if (!response) {
+    return 0;
+  }
   const sanitizedResponse = response.replace(/\s+/g, '');
   const bytes = sanitizedResponse.match(/.{1,2}/g)?.map((byte) => parseInt(byte, 16));
 
@@ -117,6 +121,9 @@ export function parsePowerStatusResponse(response: string): string | null {
  * @returns The lamp usage time in hours.
  */
 export function parseLampUsageResponse(response: string): number | null {
+  if (!response) {
+    return 0;
+  }
   // Split the hex string into an array of bytes
   console.log('parsing lamp usage', response);
   const sanitizedResponse = response.replace(/\s+/g, '');

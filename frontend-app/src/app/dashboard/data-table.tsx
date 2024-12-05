@@ -33,10 +33,16 @@ import { isAdmin } from '@/lib/utils';
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  handleRefreshDashboard: () => void;
+  isRefreshing?: boolean;
+  setIsRefreshing?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const DataTable = <TData, TValue>({ columns, data, handleRefreshDashboard }: DataTableProps<TData, TValue>) => {
+export const DataTable = <TData, TValue>({
+  columns,
+  data,
+  isRefreshing,
+  setIsRefreshing,
+}: DataTableProps<TData, TValue>) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState<any>();
   const [search, setSearch] = React.useState<string>('');
@@ -129,7 +135,7 @@ export const DataTable = <TData, TValue>({ columns, data, handleRefreshDashboard
             size='icon'
             onClick={() => {
               setIsLoading(true);
-              handleRefreshDashboard();
+              setIsRefreshing && setIsRefreshing(!isRefreshing);
               setIsLoading(false);
             }}
             disabled={isLoading}
@@ -151,7 +157,13 @@ export const DataTable = <TData, TValue>({ columns, data, handleRefreshDashboard
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          {isAdmin() && <AddProjectorForm rows={table.getRowModel().rows} />}
+          {isAdmin() && (
+            <AddProjectorForm
+              rows={table.getRowModel().rows}
+              setIsRefreshing={setIsRefreshing}
+              isRefreshing={isRefreshing}
+            />
+          )}
         </div>
       </div>
       <div className='border rounded-md'>
